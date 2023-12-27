@@ -11,6 +11,7 @@ namespace TaskListYangBotWeb.Services
     {
         private readonly List<BaseHandler> _commands;
         private readonly IUserRepository _userRepository;
+
         public CommandExecutor(IServiceProvider serviceProvider, IUserRepository userRepository)
         {
             _commands = serviceProvider.GetServices<BaseHandler>().ToList();
@@ -23,8 +24,17 @@ namespace TaskListYangBotWeb.Services
                 return;
             if (update.Type == UpdateType.Message && update.Message != null)
             {
+                if (update.Message.Text.Length <= 4 ? false : update.Message.Text.Substring(0, 4) == "AQAD")
+                {
+                    await _commands.FirstOrDefault(c => c.Name == CommandNames.CheckTokenCommand).ExecuteAsync(update);
+                    return;
+                }
                 if (_commands.Any(c => update.Message.Text == c.Name))
                 {
+                    if (!CommandStatus.commandStatus.ContainsKey(update.Message.Chat.Id))
+                    {
+                        CommandStatus.commandStatus.Add(update.Message.Chat.Id, false);
+                    }
                     await ExecuteCommand(update.Message.Text, update);
                     return;
                 }
@@ -33,7 +43,7 @@ namespace TaskListYangBotWeb.Services
                     await ExecuteReplay(update.Message.ReplyToMessage.Text, update);
                     return;
                 }
-                await _commands.FirstOrDefault(c => c.Name == "Default").ExecuteAsync(update);
+                await _commands.FirstOrDefault(c => c.Name == CommandNames.DefaultCommand).ExecuteAsync(update);
             }
             else if (update.Type == UpdateType.CallbackQuery)
             {
@@ -41,7 +51,7 @@ namespace TaskListYangBotWeb.Services
                 {
                     await ExecuteCallback(update.CallbackQuery.Data, update);
                     return;
-                } 
+                }
             }
         }
         private async Task ExecuteCommand(string commandName, Update update)

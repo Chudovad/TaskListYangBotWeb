@@ -10,6 +10,6 @@ namespace TaskListYangBotWeb.Models
         public int Id { get; set; }
         public string? TaskName { get; set; }
         public long PoolId { get; set; }
-        public ICollection<UserFavoriteTask>? UserFavoriteTasks { get; set; }
+        public User User { get; set; }
     }
 }

@@ -12,7 +12,7 @@ using TaskListYangBotWeb.Data;
 namespace TaskListYangBotWeb.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20231222143631_InitialCreate")]
+    [Migration("20231226201701_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -39,7 +39,12 @@ namespace TaskListYangBotWeb.Migrations
                     b.Property<string>("TaskName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("FavoriteTasks");
                 });
@@ -102,19 +107,15 @@ namespace TaskListYangBotWeb.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("TaskListYangBotWeb.Models.UserFavoriteTask", b =>
+            modelBuilder.Entity("TaskListYangBotWeb.Models.FavoriteTask", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.HasOne("TaskListYangBotWeb.Models.User", "User")
+                        .WithMany("FavoriteTasks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<int>("FavoriteTaskId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "FavoriteTaskId");
-
-                    b.HasIndex("FavoriteTaskId");
-
-                    b.ToTable("UserFavoriteTasks");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TaskListYangBotWeb.Models.Message", b =>
@@ -126,35 +127,11 @@ namespace TaskListYangBotWeb.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TaskListYangBotWeb.Models.UserFavoriteTask", b =>
-                {
-                    b.HasOne("TaskListYangBotWeb.Models.FavoriteTask", "FavoriteTask")
-                        .WithMany("UserFavoriteTasks")
-                        .HasForeignKey("FavoriteTaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskListYangBotWeb.Models.User", "User")
-                        .WithMany("UserFavoriteTasks")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FavoriteTask");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TaskListYangBotWeb.Models.FavoriteTask", b =>
-                {
-                    b.Navigation("UserFavoriteTasks");
-                });
-
             modelBuilder.Entity("TaskListYangBotWeb.Models.User", b =>
                 {
-                    b.Navigation("Messages");
+                    b.Navigation("FavoriteTasks");
 
-                    b.Navigation("UserFavoriteTasks");
+                    b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
         }

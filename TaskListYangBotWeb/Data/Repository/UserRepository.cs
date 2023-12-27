@@ -1,13 +1,14 @@
 ﻿using Telegram.Bot.Types;
 using TaskListYangBotWeb.Data.Interfaces;
 using TaskListYangBotWeb.Models;
-using TaskListYangTgBot;
+using TaskListYangBotWeb;
 
 namespace TaskListYangBotWeb.Data.Repository
 {
     public class UserRepository : IUserRepository
     {
         public readonly ApplicationContext _context;
+
         public UserRepository(ApplicationContext context)
         {
             _context = context;
@@ -51,6 +52,34 @@ namespace TaskListYangBotWeb.Data.Repository
             if (user == null)
                 return "";
             return Encryption.DecryptStringFromBytes(user.Token, StaticFields.passwordEncryption).Replace("\0", "");
+        }
+
+        public bool UpdateUserToken(long userId, string token)
+        {
+            var user = _context.Users.FirstOrDefault(u =>  userId == u.UserId);
+            if (user != null)
+            {
+                user.Token = Encryption.EncryptStringToBytes(token, StaticFields.passwordEncryption);
+                _context.Users.Update(user);
+                return Save(); 
+            }
+            return false;
+        }
+
+        public int GetUserSorting(long userId)
+        {
+            return _context.Users.FirstOrDefault(u => u.UserId == userId).TypeSorting;
+        }
+
+        public bool UpdateUserSorting(long userId, int typeSorting)
+        {
+            var user = _context.Users.FirstOrDefault(u => userId == u.UserId);
+            if(user != null)
+            {
+                user.TypeSorting = typeSorting;
+                return Save();
+            }
+            return false;
         }
     }
 }

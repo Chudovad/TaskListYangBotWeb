@@ -1,20 +1,19 @@
 ﻿using TaskListYangBotWeb.Helper;
-using TaskListYangTgBot;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace TaskListYangBotWeb.Handlers
+namespace TaskListYangBotWeb.Handlers.Commands
 {
-    public class DefaultHandler : BaseHandler
+    public class DefaultCommand : BaseHandler
     {
         private readonly TelegramBotClient _telegramBotClient;
 
-        public DefaultHandler(TelegramBotService telegramBotHelper)
+        public DefaultCommand(TelegramBotService telegramBotHelper)
         {
             _telegramBotClient = telegramBotHelper.GetBot().Result;
         }
-        public override string Name => "Default";
+        public override string Name => CommandNames.DefaultCommand;
 
         public override async Task ExecuteAsync(Update update)
         {

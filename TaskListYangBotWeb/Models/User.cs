@@ -16,7 +16,7 @@ namespace TaskListYangBotWeb.Models
         public DateTime DateReg { get; set; }
         public int TypeSorting { get; set; }
         public byte[]? Token { get; set; }
-        public ICollection<UserFavoriteTask>? UserFavoriteTasks { get; set; }
+        public ICollection<FavoriteTask>? FavoriteTasks { get; set; }
         public ICollection<Message>? Messages { get; set; }
     }
 }

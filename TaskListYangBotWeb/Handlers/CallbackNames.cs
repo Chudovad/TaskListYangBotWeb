@@ -2,6 +2,7 @@
 {
     public class CallbackNames
     {
-        public const string GrantAccessCallback = "grant-access";
+        public const string TypeSortingCallback = "sorting-";
+        public const string FavoriteTaskCallback = "FavoriteTask";
     }
 }

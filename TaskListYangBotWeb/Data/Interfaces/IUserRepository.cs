@@ -8,5 +8,9 @@ namespace TaskListYangBotWeb.Data.Interfaces
         bool Save();
         Models.User GetUser(long userId);
         string GetUserToken(long userId);
+        bool UpdateUserToken(long userId, string token);
+        int GetUserSorting(long userId);
+        bool UpdateUserSorting(long userId, int typeSorting);
+
     }
 }

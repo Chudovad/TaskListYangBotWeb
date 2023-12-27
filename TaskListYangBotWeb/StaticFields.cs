@@ -3,16 +3,20 @@ using TaskListYangBotWeb.Data.Interfaces;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace TaskListYangTgBot
+namespace TaskListYangBotWeb
 {
     internal class StaticFields
     {
-        //public readonly static string passwordEncryption = new ConfigurationManager().GetValue<string>("PasswordEncryption");
-        //public readonly static string linkTask = new ConfigurationManager().GetValue<string>("UrlLinkTask");
-        //public readonly static string linkManual = new ConfigurationManager().GetValue<string>("UrlLinkManual");
         public static string passwordEncryption { get; set; }
         public static string linkTask { get; set; }
         public static string linkManual { get; set; }
+
+        public static string urlTaskList { get; set; }
+        public static string urlTakeTask { get; set; }
+        public static string urlLeaveTask { get; set; }
+        public static string urlCheckToken { get; set; }
+        public static string urlTaskTitle { get; set; }
+        public static string urlCheckNorm { get; set; }
 
         private static string commandMsg = "Список команд:\n/yang \\- список заданий из Янг 📋\n/atwork \\- задания в работе 🗺\n/yangon \\- ждёт пока придут задания и берет первое 🔖" +
             "\n/yangonfavorite \\- ждёт пока придут любимые задания и берет первое ⭐️\n/favoritetasks \\- удалить или добавить в список любимых заданий ❤️" +
@@ -65,7 +69,8 @@ namespace TaskListYangTgBot
 
         public static readonly int countAddHours = 3;
 
-        private static ReplyKeyboardMarkup keyboardForYangCommand = new ReplyKeyboardMarkup(
+        private static ReplyKeyboardMarkup keyboardForYangCommand = 
+            new ReplyKeyboardMarkup(
                 new KeyboardButton[][]
                 {
                     new KeyboardButton[]
@@ -78,9 +83,9 @@ namespace TaskListYangTgBot
                         new KeyboardButton("Завершить")
                     }
                 })
-        {
-            ResizeKeyboard = true
-        };
+                {
+                    ResizeKeyboard = true
+                };
 
         public static ReplyKeyboardMarkup KeyboardForYangCommand { get { return keyboardForYangCommand; } }
 

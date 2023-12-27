@@ -1,8 +1,7 @@
-﻿using Telegram.Bot;
+﻿using TaskListYangBotWeb.Helper;
+using TaskListYangBotWeb;
+using Telegram.Bot;
 using Telegram.Bot.Types;
-using TaskListYangBotWeb.Data.Interfaces;
-using TaskListYangBotWeb.Helper;
-using TaskListYangTgBot;
 using Telegram.Bot.Types.Enums;
 
 namespace TaskListYangBotWeb.Handlers.Commands

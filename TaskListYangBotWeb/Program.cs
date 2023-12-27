@@ -1,17 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using TaskListYangBotWeb.Data;
 using TaskListYangBotWeb.Data.Interfaces;
 using TaskListYangBotWeb.Data.Repository;
+using TaskListYangBotWeb.Handlers;
 using TaskListYangBotWeb.Handlers.Callbacks;
 using TaskListYangBotWeb.Handlers.Commands;
 using TaskListYangBotWeb.Handlers.KeyboardCommands;
 using TaskListYangBotWeb.Handlers.Replies;
-using TaskListYangBotWeb.Handlers;
 using TaskListYangBotWeb.Helper;
-using TaskListYangBotWeb.Services.Interfaces;
 using TaskListYangBotWeb.Services;
-using Microsoft.EntityFrameworkCore;
-using TaskListYangBotWeb.Data;
-using Microsoft.Extensions.Configuration;
-using TaskListYangTgBot;
+using TaskListYangBotWeb.Services.Interfaces;
 
 namespace TaskListYangBotWeb
 {
@@ -27,23 +25,38 @@ namespace TaskListYangBotWeb
             StaticFields.passwordEncryption = builder.Configuration.GetValue<string>("PasswordEncryption");
             StaticFields.linkTask = builder.Configuration.GetValue<string>("UrlLinkTask");
             StaticFields.linkManual = builder.Configuration.GetValue<string>("UrlLinkManual");
+            StaticFields.urlTaskList = builder.Configuration.GetValue<string>("UrlTaskList");
+            StaticFields.urlTakeTask = builder.Configuration.GetValue<string>("UrlTakeTask");
+            StaticFields.urlLeaveTask = builder.Configuration.GetValue<string>("UrlLeaveTask");
+            StaticFields.urlCheckToken = builder.Configuration.GetValue<string>("UrlCheckToken");
+            StaticFields.urlTaskTitle = builder.Configuration.GetValue<string>("UrlTaskTitle");
+            StaticFields.urlCheckNorm = builder.Configuration.GetValue<string>("UrlCheckNorm");
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddSingleton<TelegramBotService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IFavoriteTaskRepository, FavoriteTaskRepository>();
 
             builder.Services.AddScoped<ICommandExecutor, CommandExecutor>();
             builder.Services.AddScoped<BaseHandler, StartCommand>();
-
             builder.Services.AddScoped<BaseHandler, HelpCommand>();
+            builder.Services.AddScoped<BaseHandler, AtWorkCommand>();
+            builder.Services.AddScoped<BaseHandler, TasksSortingCommand>();
+            builder.Services.AddScoped<BaseHandler, NormaCommand>();
+            builder.Services.AddScoped<BaseHandler, YangCommand>();
+            builder.Services.AddScoped<BaseHandler, YangOnCommand>();
+            builder.Services.AddScoped<BaseHandler, YangOnFavoriteCommand>();
+            builder.Services.AddScoped<BaseHandler, FavoriteTaskCommand>();
 
             builder.Services.AddScoped<BaseHandler, MsgAllUsersReply>();
 
-            builder.Services.AddScoped<BaseHandler, GrantAccessUserCallback>();
+            builder.Services.AddScoped<BaseHandler, TypeSortingCallback>();
+            builder.Services.AddScoped<BaseHandler, ExitTaskCallback>();
             builder.Services.AddScoped<BaseHandler, BusKeyboardCommand>();
-            builder.Services.AddScoped<BaseHandler, DefaultHandler>();
+            builder.Services.AddScoped<BaseHandler, DefaultCommand>();
+            builder.Services.AddScoped<BaseHandler, CheckTokenCommand>();
 
             var app = builder.Build();
 

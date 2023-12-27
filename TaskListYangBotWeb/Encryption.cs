@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using TaskListYangBotWeb.Data.Interfaces;
 
-namespace TaskListYangTgBot
+namespace TaskListYangBotWeb
 {
     class Encryption
     {

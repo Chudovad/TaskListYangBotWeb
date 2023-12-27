@@ -61,7 +61,7 @@ namespace TaskListYangBotWeb.Services
         }
         private async Task ExecuteReplay(string replyString, Update update)
         {
-            BaseHandler _lastCommand = _commands.First(x => replyString.Contains(x.Name));
+            BaseHandler _lastCommand = _commands.First(x => replyString.Substring(0, 20).Contains(x.Name));
             await _lastCommand.ExecuteAsync(update);
         }
         private async Task ExecuteCallback(string callback, Update update)

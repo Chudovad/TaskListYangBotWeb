@@ -13,15 +13,15 @@ namespace TaskListYangBotWeb.Data.Repository
             _context = context;
         }
 
-        public bool AddFavoriteTask(long userId, List<dynamic> userTasks)
+        public bool AddFavoriteTask(long userId, string taskName, long poolId)
         {
             var user = _context.Users.FirstOrDefault(x => x.UserId == userId);
-            if (user != null)
+            if (user != null && !CheckUserTask(userId, taskName))
             {
                 FavoriteTask favoriteTask = new FavoriteTask()
                 {
-                    TaskName = userTasks[0].description,
-                    PoolId = userTasks[0].pools[0].id,
+                    TaskName = taskName,
+                    PoolId = poolId,
                     User = user,
                 };
                 _context.Add(favoriteTask);
@@ -30,7 +30,19 @@ namespace TaskListYangBotWeb.Data.Repository
             return false;
         }
 
-        public ICollection<FavoriteTask> GetUserFavoriteTask(long userId)
+        public bool CheckUserTask(long userId, string taskName)
+        {
+            return _context.FavoriteTasks.Include(c => c.User).Any(x => x.User.UserId == userId && x.TaskName == taskName);
+        }
+
+        public bool DeleteFavoriteTask(long userId, long poolId)
+        {
+            var userFavoriteTask = _context.FavoriteTasks.Include(c => c.User).FirstOrDefault(u => u.User.UserId == userId && u.PoolId == poolId);
+            _context.Remove(userFavoriteTask);
+            return Save();
+        }
+
+        public ICollection<FavoriteTask> GetUserFavoriteTasks(long userId)
         {
             return _context.FavoriteTasks.Include(c => c.User).Where(u => u.User.UserId == userId).ToList();
         }

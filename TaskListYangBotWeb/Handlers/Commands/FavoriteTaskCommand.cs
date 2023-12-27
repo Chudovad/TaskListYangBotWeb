@@ -23,7 +23,7 @@ namespace TaskListYangBotWeb.Handlers.Commands
 
         public override async Task ExecuteAsync(Update update)
         {
-            List<FavoriteTask> favoriteTasks =_favoriteTaskRepository.GetUserFavoriteTask(update.Message.Chat.Id).ToList();
+            List<FavoriteTask> favoriteTasks =_favoriteTaskRepository.GetUserFavoriteTasks(update.Message.Chat.Id).ToList();
             if (favoriteTasks.Count != 0)
             {
                 await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.RemoveMsg, replyMarkup: CreateButtons.GetButtonsFavoriteTasks(favoriteTasks));

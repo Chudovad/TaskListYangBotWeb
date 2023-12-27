@@ -45,9 +45,6 @@ namespace TaskListYangBotWeb.Handlers.Commands
 
         public async void CreateMsgTask(Update update, string tokenYang, List<dynamic> taskList, TelegramBotClient client)
         {
-            string message;
-            ParseYangService parseYangService = new ParseYangService();
-
             if (taskList.Count == 0)
             {
                 await client.SendTextMessageAsync(update.Message.Chat.Id, "Заданий нет", replyMarkup: new ReplyKeyboardRemove());
@@ -57,18 +54,14 @@ namespace TaskListYangBotWeb.Handlers.Commands
             {
                 foreach (var item in taskList)
                 {
-                    message = "🔹" + "Задание 🔹\r\n" + item.description + "(" + item.pools[0].reward + ")" + "\r\n" + item.title + "\r\n";
-
                     if (item.pools[0].activeAssignments != null)
                     {
-                        string linkTask = StaticFields.linkTask + item.pools[0].id + "/" + item.pools[0].activeAssignments[0].id;
                         var takeTaskResponse = ParseYangService.RequestToApiTakeTask(item.pools[0].id.ToString(), tokenYang);
-                        message = parseYangService.MessageTakeTask(takeTaskResponse);
-                        IReplyMarkup replyMarkup = CreateButtons.GetButton(takeTaskResponse);
-                        await client.SendTextMessageAsync(update.Message.Chat.Id, message, replyMarkup: replyMarkup);
+                        ParseYangService.GetMessageTakingTask(takeTaskResponse, _telegramBotClient, update);
                     }
                     else
                     {
+                        string message = "🔹" + "Задание 🔹\r\n" + item.description + "(" + item.pools[0].reward + ")" + "\r\n" + item.title + "\r\n";
                         IReplyMarkup replyMarkup = CreateButtons.GetButton((int)item.pools[0].id, "Приступить", "В любимые");
                         await client.SendTextMessageAsync(update.Message.Chat.Id, message, replyMarkup: replyMarkup);
                         Thread.Sleep(100);

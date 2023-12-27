@@ -10,25 +10,7 @@ namespace TaskListYangBotWeb
 
         public static void AddToDictionaryTaskList(int sortingType, string tokenYang, long chatId)
         {
-            List<dynamic> sortedTasks;
-            if (sortingType == 1)
-            {
-                sortedTasks = ParseYangService.RequestToApiTaskList(tokenYang)
-                            .Where(x => x.projectMetaInfo.ignored != true)
-                            .OrderBy(r => double.Parse((string)r.pools[0].reward, CultureInfo.InvariantCulture)).ToList();
-            }
-            else if (sortingType == 0)
-            {
-                sortedTasks = ParseYangService.RequestToApiTaskList(tokenYang)
-                            .Where(x => x.projectMetaInfo.ignored != true)
-                            .OrderByDescending(r => double.Parse((string)r.pools[0].reward, CultureInfo.InvariantCulture)).ToList();
-            }
-            else
-            {
-                sortedTasks = ParseYangService.RequestToApiTaskList(tokenYang)
-                            .Where(x => x.projectMetaInfo.ignored != true)
-                            .ToList();
-            }
+            List<dynamic> sortedTasks = AutomaticTaskPickupService.ApplySorting(ParseYangService.RequestToApiTaskList(tokenYang).Where(x => x.projectMetaInfo.ignored != true), sortingType);
 
             if (!taskListsUsers.ContainsKey(chatId))
             {

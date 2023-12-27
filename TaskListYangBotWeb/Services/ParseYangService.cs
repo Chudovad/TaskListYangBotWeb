@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot;
 using Microsoft.Extensions.ObjectPool;
+using Telegram.Bot.Types;
+using TaskListYangBotWeb.Models;
 
 namespace TaskListYangBotWeb.Services
 {
@@ -146,10 +148,17 @@ namespace TaskListYangBotWeb.Services
             };
             return body;
         }
-        public string MessageTakeTask(dynamic takeTaskResponse)
+
+        public static async Task GetMessageTakingTask(dynamic takeTaskResponse, TelegramBotClient _telegramBotClient, Update update)
         {
+            long chatId;
+            if (update.Message != null)
+                chatId = update.Message.Chat.Id;
+            else
+                chatId = update.CallbackQuery.Message.Chat.Id;
             try
             {
+                string message;
                 if (takeTaskResponse.statusCode == 200)
                 {
                     if (takeTaskResponse.tasks != null)
@@ -174,19 +183,21 @@ namespace TaskListYangBotWeb.Services
                                 environment = ParseWebEnvironment(takeTaskResponse);
                             }
                         }
-                        return $"🔹 Взято задание 🔹\r\n{projectName} ({reward})\r\n\r\n{environment}{environmentShort}\r\n{checkEnvironmentOld}";
-                        //: checkEnvironment == "" ? GetButton(takeTaskResponse.poolId, "Выйти", "Ссылка на задание", linkTask) : GetButton(takeTaskResponse.poolId, "Выйти", "Ссылка на задание", "Ссылка на проверку окружения", "Ссылка на тестовый стенд", linkTask, checkEnvironment, urlTestStand));
+                        IReplyMarkup replyMarkup = CreateButtons.GetButton(takeTaskResponse);
+                        await _telegramBotClient.SendTextMessageAsync(chatId, $"🔹 Взято задание 🔹\r\n{projectName} ({reward})\r\n\r\n{environment}{environmentShort}\r\n{checkEnvironmentOld}", replyMarkup: replyMarkup);
+                        return;
                     }
                 }
-                return HandleErrorMessages(takeTaskResponse);
+                message = HandleErrorMessages(takeTaskResponse);
+                await _telegramBotClient.SendTextMessageAsync(chatId, message);
             }
-            catch
+            catch (Exception ex)
             {
-                return "Ошибка при взятии задания!";
+                await _telegramBotClient.SendTextMessageAsync(chatId, $"Ошибка! {ex.Message}");
             }
         }
 
-        private string HandleErrorMessages(dynamic takeTaskResponse)
+        private static string HandleErrorMessages(dynamic takeTaskResponse)
         {
             if (takeTaskResponse.message == "There are no more assignments in current pool" || takeTaskResponse.message == "There are no more assignments in merged pools")
             {
@@ -202,7 +213,7 @@ namespace TaskListYangBotWeb.Services
             }
         }
 
-        private string ParseWebEnvironment(dynamic takeTaskResponse)
+        private static string ParseWebEnvironment(dynamic takeTaskResponse)
         {
             string environment;
             string json;

@@ -50,10 +50,14 @@ namespace TaskListYangBotWeb
             builder.Services.AddScoped<BaseHandler, YangOnFavoriteCommand>();
             builder.Services.AddScoped<BaseHandler, FavoriteTaskCommand>();
 
-            builder.Services.AddScoped<BaseHandler, MsgAllUsersReply>();
+            builder.Services.AddScoped<BaseHandler, AddToFavoriteReply>();
 
             builder.Services.AddScoped<BaseHandler, TypeSortingCallback>();
             builder.Services.AddScoped<BaseHandler, ExitTaskCallback>();
+            builder.Services.AddScoped<BaseHandler, TakeTaskCallback>();
+            builder.Services.AddScoped<BaseHandler, AddToFavoriteCallback>();
+            builder.Services.AddScoped<BaseHandler, DeleteFavoriteTaskCallback>();
+
             builder.Services.AddScoped<BaseHandler, BusKeyboardCommand>();
             builder.Services.AddScoped<BaseHandler, DefaultCommand>();
             builder.Services.AddScoped<BaseHandler, CheckTokenCommand>();

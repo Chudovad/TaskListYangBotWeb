@@ -21,7 +21,6 @@ namespace TaskListYangBotWeb.Handlers.Commands
 
         public override async Task ExecuteAsync(Update update)
         {
-            ParseYangService yangCommand = new ParseYangService();
             string userToken = _userRepository.GetUserToken(update.Message.Chat.Id);
             List<dynamic> taskListInProgress = ParseYangService.RequestToApiTaskList(userToken).Where(x => x.pools[0].activeAssignments != null && x.pools[0].activeAssignments.Count > 0).ToList();
             if (taskListInProgress.Count != 0)
@@ -29,14 +28,7 @@ namespace TaskListYangBotWeb.Handlers.Commands
                 foreach (var item in taskListInProgress)
                 {
                     var takeTaskResponse = ParseYangService.RequestToApiTakeTask(item.pools[0].id.ToString(), userToken);
-                    string message = yangCommand.MessageTakeTask(takeTaskResponse);
-                    if (!message.Contains("Ошибка"))
-                    {
-                        IReplyMarkup replyMarkup = CreateButtons.GetButton(takeTaskResponse);
-                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, message, replyMarkup: replyMarkup);
-                    }
-                    else
-                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, message);
+                    ParseYangService.GetMessageTakingTask(takeTaskResponse, _telegramBotClient, update);
                 }
             }
             else

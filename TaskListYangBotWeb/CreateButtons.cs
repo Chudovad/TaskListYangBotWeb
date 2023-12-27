@@ -40,7 +40,7 @@ namespace TaskListYangBotWeb
         {
             InlineKeyboardButton[][] keyboardButton = new InlineKeyboardButton[][]
             {
-                new InlineKeyboardButton[] { new InlineKeyboardButton(textButton1) { CallbackData = id.ToString() + textButton1 }, new InlineKeyboardButton(textButton2) { CallbackData = id.ToString() + textButton2 } }
+                new InlineKeyboardButton[] { new InlineKeyboardButton(textButton1) { CallbackData = id.ToString() + CallbackNames.TakeTaskCallback }, new InlineKeyboardButton(textButton2) { CallbackData = id.ToString() + CallbackNames.AddToFavoriteCallback } }
             };
             return new InlineKeyboardMarkup(keyboardButton);
         }
@@ -49,7 +49,7 @@ namespace TaskListYangBotWeb
         {
             InlineKeyboardButton[][] keyboardButton = new InlineKeyboardButton[][]
             {
-                new InlineKeyboardButton[] { new InlineKeyboardButton(textButton1) { CallbackData = id.ToString() + textButton1 }, new InlineKeyboardButton(textButton2) { CallbackData = id.ToString() + textButton2, Url = url } }
+                new InlineKeyboardButton[] { new InlineKeyboardButton(textButton1) { CallbackData = id.ToString() + CallbackNames.ExitTaskCallback }, new InlineKeyboardButton(textButton2) { CallbackData = id.ToString() + textButton2, Url = url } }
             };
             return new InlineKeyboardMarkup(keyboardButton);
         }
@@ -58,7 +58,7 @@ namespace TaskListYangBotWeb
         {
             InlineKeyboardButton[][] keyboardButton = new InlineKeyboardButton[][]
             {
-                new InlineKeyboardButton[] { new InlineKeyboardButton(textButton1) { CallbackData = id.ToString() + textButton1 }, new InlineKeyboardButton(textButton2) { CallbackData = id.ToString() + textButton2, Url = urlFor2 } },
+                new InlineKeyboardButton[] { new InlineKeyboardButton(textButton1) { CallbackData = id.ToString() + CallbackNames.ExitTaskCallback }, new InlineKeyboardButton(textButton2) { CallbackData = id.ToString() + textButton2, Url = urlFor2 } },
                 new InlineKeyboardButton[] { new InlineKeyboardButton(textButton3) { CallbackData = id.ToString() + textButton3, Url = urlFor3 } }
 
             };
@@ -69,7 +69,7 @@ namespace TaskListYangBotWeb
         {
             InlineKeyboardButton[][] keyboardButton = new InlineKeyboardButton[][]
             {
-                new InlineKeyboardButton[] { new InlineKeyboardButton(textButton1) { CallbackData = id.ToString() + textButton1 }, new InlineKeyboardButton(textButton2) { CallbackData = id.ToString() + textButton2, Url = urlFor2 } },
+                new InlineKeyboardButton[] { new InlineKeyboardButton(textButton1) { CallbackData = id.ToString() + CallbackNames.ExitTaskCallback }, new InlineKeyboardButton(textButton2) { CallbackData = id.ToString() + textButton2, Url = urlFor2 } },
                 new InlineKeyboardButton[] { new InlineKeyboardButton(textButton3) { CallbackData = id.ToString() + textButton3, Url = urlFor3 } },
                 new InlineKeyboardButton[] { new InlineKeyboardButton(textButton4) { CallbackData = id.ToString() + textButton4, Url = urlTestStand } }
 
@@ -97,13 +97,9 @@ namespace TaskListYangBotWeb
             for (int i = 0; i < favoriteTasks.Count; i++)
             {
                 inlineKeyboard.Add(new InlineKeyboardButton[] { new InlineKeyboardButton(favoriteTasks[i].TaskName) });
-                inlineKeyboard[i][0].CallbackData = CallbackNames.FavoriteTaskCallback + favoriteTasks[i].PoolId;
+                inlineKeyboard[i][0].CallbackData = CallbackNames.DeleteFavoriteTaskCallback + favoriteTasks[i].PoolId;
             }
-
-            // Keyboard
-            InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(inlineKeyboard.ToArray());
-
-            return keyboard;
+            return new InlineKeyboardMarkup(inlineKeyboard.ToArray());
         }
     }
 }

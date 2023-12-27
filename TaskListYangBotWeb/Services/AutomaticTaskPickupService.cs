@@ -16,7 +16,7 @@ namespace TaskListYangBotWeb.Services
 
             string tokenYang = _userRepository.GetUserToken(update.Message.Chat.Id);
             int typeSorting = _userRepository.GetUserSorting(update.Message.Chat.Id);
-            List<FavoriteTask> listFavoriteTasks = _favoriteTaskRepository.GetUserFavoriteTask(update.Message.Chat.Id).ToList();
+            List<FavoriteTask> listFavoriteTasks = _favoriteTaskRepository.GetUserFavoriteTasks(update.Message.Chat.Id).ToList();
             int waitTime = 2000;
             int periodOfSendingNotification = 500;
 
@@ -68,18 +68,10 @@ namespace TaskListYangBotWeb.Services
 
                 if (takeTaskResponse.statusCode == 200)
                 {
-                    ParseYangService yangCommand = new ParseYangService();
-                    string message = yangCommand.MessageTakeTask(takeTaskResponse);
-                    if (!message.Contains("Ошибка"))
-                    {
-                        IReplyMarkup replyMarkup = CreateButtons.GetButton(takeTaskResponse);
-                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, message, replyMarkup: replyMarkup);
-                        CommandStatus.commandStatus[update.Message.Chat.Id] = false;
-                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, withFavorite == true ? $"Команда {CommandNames.YangOnFavoriteCommand} выключена" : $"Команда {CommandNames.YangOnCommand} выключена", replyMarkup: new ReplyKeyboardRemove());
-                        break;
-                    }
-                    else
-                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, message);
+                    ParseYangService.GetMessageTakingTask(takeTaskResponse, _telegramBotClient, update);
+                    CommandStatus.commandStatus[update.Message.Chat.Id] = false;
+                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, withFavorite == true ? $"Команда {CommandNames.YangOnFavoriteCommand} выключена" : $"Команда {CommandNames.YangOnCommand} выключена", replyMarkup: new ReplyKeyboardRemove());
+                    break;
                 }
             }
             Thread.Sleep(waitTime);

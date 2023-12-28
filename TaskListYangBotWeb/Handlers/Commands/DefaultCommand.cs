@@ -17,7 +17,7 @@ namespace TaskListYangBotWeb.Handlers.Commands
 
         public override async Task ExecuteAsync(Update update)
         {
-            await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.GetTokenMsg + StaticFields.LinkToManual, parseMode: ParseMode.MarkdownV2);
+            await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.CommandMsg, parseMode: ParseMode.MarkdownV2);
         }
     }
 }

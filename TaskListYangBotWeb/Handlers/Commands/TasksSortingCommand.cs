@@ -19,9 +19,10 @@ namespace TaskListYangBotWeb.Handlers.Commands
 
         public override async Task ExecuteAsync(Update update)
         {
+            int userSorting = _userRepository.GetUserSorting(update.Message.Chat.Id);
             await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id,
-                StaticFields.GetTaskSortingText(_userRepository.GetUserSorting(update.Message.Chat.Id)),
-                replyMarkup: CreateButtons.GetButton(StaticFields.TypesSorting));
+                StaticFields.GetTaskSortingText(userSorting),
+                replyMarkup: CreateButtons.GetButtonTypesSorting(StaticFields.TypesSorting, userSorting));
         }
     }
 }

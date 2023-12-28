@@ -34,7 +34,7 @@ namespace TaskListYangBotWeb.Handlers.Replies
                 if (favoriteTasks.Count != 0)
                 {
                     await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.RemoveMsg, replyMarkup: CreateButtons.GetButtonsFavoriteTasks(favoriteTasks));
-                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.RemoveMsg + StaticFields.FavoriteTaskMsg
+                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.FavoriteTaskMsg
                         , replyMarkup: new ForceReplyMarkup { Selective = true, InputFieldPlaceholder = "Название задания" });
                 }
                 else

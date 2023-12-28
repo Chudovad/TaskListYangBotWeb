@@ -31,7 +31,7 @@ namespace TaskListYangBotWeb.Handlers.Commands
             if (CommandStatus.taskListsUsers[update.Message.Chat.Id].Count <= 20)
             {
                 await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Количество заданий: " + CommandStatus.taskListsUsers[update.Message.Chat.Id].Count + "\r\n" + "🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸\r\n");
-                CreateMsgTask(update, tokenYang, CommandStatus.taskListsUsers[update.Message.Chat.Id], _telegramBotClient);
+                await CreateMsgTask(update, tokenYang, CommandStatus.taskListsUsers[update.Message.Chat.Id], _telegramBotClient);
             }
             else
             {
@@ -39,11 +39,11 @@ namespace TaskListYangBotWeb.Handlers.Commands
 
                 await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Количество заданий: " + CommandStatus.taskListsUsers[update.Message.Chat.Id].Count + "\r\n" + "🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸\r\n",
                     replyMarkup: pageTasks.Count >= 20 ? StaticFields.KeyboardForYangCommand : new ReplyKeyboardRemove());
-                CreateMsgTask(update, tokenYang, pageTasks, _telegramBotClient);
+                await CreateMsgTask(update, tokenYang, pageTasks, _telegramBotClient);
             }
         }
 
-        public async void CreateMsgTask(Update update, string tokenYang, List<dynamic> taskList, TelegramBotClient client)
+        public static async Task CreateMsgTask(Update update, string tokenYang, List<dynamic> taskList, TelegramBotClient client)
         {
             if (taskList.Count == 0)
             {
@@ -57,7 +57,7 @@ namespace TaskListYangBotWeb.Handlers.Commands
                     if (item.pools[0].activeAssignments != null)
                     {
                         var takeTaskResponse = ParseYangService.RequestToApiTakeTask(item.pools[0].id.ToString(), tokenYang);
-                        ParseYangService.GetMessageTakingTask(takeTaskResponse, _telegramBotClient, update);
+                        ParseYangService.GetMessageTakingTask(takeTaskResponse, client, update);
                     }
                     else
                     {

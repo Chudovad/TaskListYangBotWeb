@@ -2,6 +2,7 @@
 {
     public class ReplayNames
     {
-        public const string AddToFavoriteReply = "Нажмите на кнопку с";
+        public const string AddToFavoriteReply = "Отправьте название";
+        public const string CheckTokenReply = "Отправь в ответ на";
     }
 }

@@ -58,9 +58,11 @@ namespace TaskListYangBotWeb
             builder.Services.AddScoped<BaseHandler, AddToFavoriteCallback>();
             builder.Services.AddScoped<BaseHandler, DeleteFavoriteTaskCallback>();
 
-            builder.Services.AddScoped<BaseHandler, BusKeyboardCommand>();
+            builder.Services.AddScoped<BaseHandler, CompleteYangOnKeyboardCommand>();
+            builder.Services.AddScoped<BaseHandler, CompleteYangKeyboardCommand>();
+            builder.Services.AddScoped<BaseHandler, GetTwentyTaskKeyboardCommand>();
             builder.Services.AddScoped<BaseHandler, DefaultCommand>();
-            builder.Services.AddScoped<BaseHandler, CheckTokenCommand>();
+            builder.Services.AddScoped<BaseHandler, CheckTokenReply>();
 
             var app = builder.Build();
 

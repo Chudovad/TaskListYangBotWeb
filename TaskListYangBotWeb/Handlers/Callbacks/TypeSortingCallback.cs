@@ -2,6 +2,7 @@
 using TaskListYangBotWeb.Helper;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TaskListYangBotWeb.Handlers.Callbacks
 {
@@ -22,9 +23,9 @@ namespace TaskListYangBotWeb.Handlers.Callbacks
             await _telegramBotClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Загрузка...");
             int indexSorting = Convert.ToInt32(update.CallbackQuery.Data.Replace(CallbackNames.TypeSortingCallback, ""));
             if (_userRepository.UpdateUserSorting(update.CallbackQuery.Message.Chat.Id, indexSorting))
-            {
-                await _telegramBotClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, $"Выбрана сортировка: {StaticFields.TypesSorting[indexSorting]}");
-            }
+                await _telegramBotClient.EditMessageReplyMarkupAsync(update.CallbackQuery.Message.Chat.Id,
+                    messageId: update.CallbackQuery.Message.MessageId,
+                    replyMarkup: (InlineKeyboardMarkup)CreateButtons.GetButtonTypesSorting(StaticFields.TypesSorting, indexSorting));
         }
     }
 }

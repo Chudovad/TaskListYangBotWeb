@@ -12,6 +12,5 @@
         public const string YangOnCommand = "/yangon";
         public const string YangOnFavoriteCommand = "/yangonfavorite";
         public const string DefaultCommand = "Default";
-        public const string CheckTokenCommand = "CheckToken";
     }
 }

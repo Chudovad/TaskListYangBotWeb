@@ -4,6 +4,7 @@ using TaskListYangBotWeb;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TaskListYangBotWeb.Handlers.Commands
 {
@@ -23,6 +24,9 @@ namespace TaskListYangBotWeb.Handlers.Commands
         {
             _userRepository.CreateUser(update);
             await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Привет\\!" + StaticFields.HelpMsg, parseMode: ParseMode.MarkdownV2);
+            await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.GetTokenMsg, 
+                replyMarkup: new ForceReplyMarkup { Selective = true, InputFieldPlaceholder = "OAuth токен" },
+                parseMode: ParseMode.MarkdownV2);
         }
     }
 }

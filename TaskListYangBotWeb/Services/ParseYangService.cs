@@ -6,6 +6,8 @@ using Telegram.Bot;
 using Microsoft.Extensions.ObjectPool;
 using Telegram.Bot.Types;
 using TaskListYangBotWeb.Models;
+using TaskListYangBotWeb.Data.Interfaces;
+using TaskListYangBotWeb.Handlers.Commands;
 
 namespace TaskListYangBotWeb.Services
 {
@@ -174,14 +176,10 @@ namespace TaskListYangBotWeb.Services
                             environmentShort = takeTaskResponse.tasks[0].input_values.data.testrun_info.environment != null ? $"({Regex.Replace(Convert.ToString(takeTaskResponse.tasks[0].input_values.data.testrun_info.environment), @"<[^>]+>|&nbsp;|&emsp;", " ")})" : "";
                             checkEnvironmentOld = takeTaskResponse.tasks[0].input_values.data.testrun_info.final_requester_code != null ? $"Код проверки окружения: {takeTaskResponse.tasks[0].input_values.data.testrun_info.final_requester_code}" : "";
 
-                            if (takeTaskResponse.tasks[0].input_values.data.testrun_info.env_descr != null)
-                            {
+                            if (takeTaskResponse.tasks[0].input_values.data.testrun_info.env_descr == null)
                                 environment = $"Окружение: {Regex.Replace(Convert.ToString(takeTaskResponse.tasks[0].input_values.data.testrun_info.env_descr).Replace("unknown", ""), @"<[^>]+>|&nbsp;|&emsp;", " ")}";
-                            }
                             else
-                            {
                                 environment = ParseWebEnvironment(takeTaskResponse);
-                            }
                         }
                         IReplyMarkup replyMarkup = CreateButtons.GetButton(takeTaskResponse);
                         await _telegramBotClient.SendTextMessageAsync(chatId, $"🔹 Взято задание 🔹\r\n{projectName} ({reward})\r\n\r\n{environment}{environmentShort}\r\n{checkEnvironmentOld}", replyMarkup: replyMarkup);
@@ -224,6 +222,14 @@ namespace TaskListYangBotWeb.Services
             }
             environment = $"Окружение: {Regex.Replace(Regex.Replace(json, @"<.*?>", " ").Replace("ИЛИ", "").Replace(" И ", "").Replace("&gt;", ">").Replace("&lt;", "<"), @"\s+", " ")}";
             return environment;
+        }
+
+        public static async Task GetNextPageTaskList(Update update, TelegramBotClient _telegramBotClient, IUserRepository _userRepository, int pageSize)
+        {
+            PaginationService.numberOfPageDic[update.Message.Chat.Id]++;
+            string tokenYang = _userRepository.GetUserToken(update.Message.Chat.Id);
+            var taskList = new PaginationService().GetPage(CommandStatus.taskListsUsers[update.Message.Chat.Id], PaginationService.numberOfPageDic[update.Message.Chat.Id], pageSize);
+            await YangCommand.CreateMsgTask(update, tokenYang, taskList, _telegramBotClient);
         }
     }
 }

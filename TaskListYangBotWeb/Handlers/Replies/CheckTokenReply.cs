@@ -1,24 +1,24 @@
-﻿using TaskListYangBotWeb.Helper;
+﻿using TaskListYangBotWeb.Data.Interfaces;
+using TaskListYangBotWeb.Helper;
+using TaskListYangBotWeb.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using TaskListYangBotWeb.Models;
-using TaskListYangBotWeb.Services;
-using TaskListYangBotWeb.Data.Interfaces;
+using Telegram.Bot.Types.ReplyMarkups;
 
-namespace TaskListYangBotWeb.Handlers.Commands
+namespace TaskListYangBotWeb.Handlers.Replies
 {
-    public class CheckTokenCommand : BaseHandler
+    public class CheckTokenReply : BaseHandler
     {
         private readonly TelegramBotClient _telegramBotClient;
         private readonly IUserRepository _userRepository;
 
-        public CheckTokenCommand(TelegramBotService telegramBotHelper, IUserRepository userRepository)
+        public CheckTokenReply(TelegramBotService telegramBotHelper, IUserRepository userRepository)
         {
             _telegramBotClient = telegramBotHelper.GetBot().Result;
             _userRepository = userRepository;
         }
-        public override string Name => CommandNames.CheckTokenCommand;
+        public override string Name => ReplayNames.CheckTokenReply;
 
         public override async Task ExecuteAsync(Update update)
         {
@@ -32,8 +32,11 @@ namespace TaskListYangBotWeb.Handlers.Commands
             else
             {
                 await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id,
-                    "Неверный токен" + StaticFields.LinkToManual,
-                    replyToMessageId: update.Message.MessageId, parseMode: ParseMode.MarkdownV2);
+                    "Неверный токен.",
+                    replyToMessageId: update.Message.MessageId);
+                await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.GetTokenMsg,
+                    replyMarkup: new ForceReplyMarkup { Selective = true, InputFieldPlaceholder = "OAuth токен" },
+                    parseMode: ParseMode.MarkdownV2);
             }
         }
     }

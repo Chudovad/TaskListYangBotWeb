@@ -7,13 +7,9 @@
         public void AddToDictionaryNumberPage(long chatId, int numberOfPage)
         {
             if (!numberOfPageDic.ContainsKey(chatId))
-            {
                 numberOfPageDic.Add(chatId, numberOfPage);
-            }
             else
-            {
                 numberOfPageDic[chatId] = numberOfPage;
-            }
         }
 
         public List<dynamic> GetPage(List<dynamic> list, int page, int pageSize)

@@ -77,13 +77,16 @@ namespace TaskListYangBotWeb
             return new InlineKeyboardMarkup(keyboardButton);
         }
 
-        public static IReplyMarkup GetButton(List<string> textButtons)
+        public static IReplyMarkup GetButtonTypesSorting(List<string> textButtons, int typeSorting)
         {
             List<InlineKeyboardButton[]> inlineKeyboard = new List<InlineKeyboardButton[]>();
 
             for (int i = 0; i < textButtons.Count; i++)
             {
-                inlineKeyboard.Add(new InlineKeyboardButton[] { new InlineKeyboardButton(textButtons[i]) });
+                if (typeSorting == i)
+                    inlineKeyboard.Add(new InlineKeyboardButton[] { new InlineKeyboardButton(textButtons[i] + " ☑️") });
+                else
+                    inlineKeyboard.Add(new InlineKeyboardButton[] { new InlineKeyboardButton(textButtons[i]) });
                 inlineKeyboard[i][0].CallbackData = CallbackNames.TypeSortingCallback + i.ToString();
             }
 

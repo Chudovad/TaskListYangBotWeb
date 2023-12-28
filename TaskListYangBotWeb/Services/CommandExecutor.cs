@@ -24,21 +24,23 @@ namespace TaskListYangBotWeb.Services
                 return;
             if (update.Type == UpdateType.Message && update.Message != null)
             {
-                if (update.Message.Text.Length <= 4 ? false : update.Message.Text.Substring(0, 4) == "AQAD")
+                if (update.Message.Text == null)
+                    return;
+                if (update.Message.Text != CommandNames.StartCommand 
+                    && ParseYangService.RequestToApiCheckToken(_userRepository.GetUserToken(update.Message.Chat.Id)).message != null 
+                    && update.Message.ReplyToMessage == null)
                 {
-                    await _commands.FirstOrDefault(c => c.Name == CommandNames.CheckTokenCommand).ExecuteAsync(update);
+                    await _commands.FirstOrDefault(c => c.Name == CommandNames.StartCommand).ExecuteAsync(update);
                     return;
                 }
                 if (_commands.Any(c => update.Message.Text == c.Name))
                 {
                     if (!CommandStatus.commandStatus.ContainsKey(update.Message.Chat.Id))
-                    {
                         CommandStatus.commandStatus.Add(update.Message.Chat.Id, false);
-                    }
                     await ExecuteCommand(update.Message.Text, update);
                     return;
                 }
-                if (update.Message.ReplyToMessage != null && _commands.Any(c => update.Message.ReplyToMessage.Text.Contains(c.Name)))
+                if (update.Message.ReplyToMessage != null && update.Message.ReplyToMessage.Text != null && _commands.Any(c => update.Message.ReplyToMessage.Text.Contains(c.Name)))
                 {
                     await ExecuteReplay(update.Message.ReplyToMessage.Text, update);
                     return;

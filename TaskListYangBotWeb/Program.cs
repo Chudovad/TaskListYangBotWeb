@@ -18,7 +18,7 @@ namespace TaskListYangBotWeb
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
             // добавляем контекст ApplicationContext в качестве сервиса в приложение
             builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 

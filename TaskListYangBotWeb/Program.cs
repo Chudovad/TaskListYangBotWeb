@@ -38,6 +38,7 @@ namespace TaskListYangBotWeb
             builder.Services.AddSingleton<TelegramBotService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IFavoriteTaskRepository, FavoriteTaskRepository>();
+            builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
             builder.Services.AddScoped<ICommandExecutor, CommandExecutor>();
             builder.Services.AddScoped<BaseHandler, StartCommand>();

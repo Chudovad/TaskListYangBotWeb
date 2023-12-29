@@ -11,11 +11,13 @@ namespace TaskListYangBotWeb.Services
     {
         private readonly List<BaseHandler> _commands;
         private readonly IUserRepository _userRepository;
+        private readonly IMessageRepository _messageRepository;
 
-        public CommandExecutor(IServiceProvider serviceProvider, IUserRepository userRepository)
+        public CommandExecutor(IServiceProvider serviceProvider, IUserRepository userRepository, IMessageRepository messageRepository)
         {
             _commands = serviceProvider.GetServices<BaseHandler>().ToList();
             _userRepository = userRepository;
+            _messageRepository = messageRepository;
         }
 
         public async Task Execute(Update update)
@@ -26,6 +28,7 @@ namespace TaskListYangBotWeb.Services
             {
                 if (update.Message.Text == null)
                     return;
+                _messageRepository.AddUserMessage(update.Message.Chat.Id, update.Message.Text);
                 if (update.Message.Text != CommandNames.StartCommand 
                     && ParseYangService.RequestToApiCheckToken(_userRepository.GetUserToken(update.Message.Chat.Id)).message != null 
                     && update.Message.ReplyToMessage == null)

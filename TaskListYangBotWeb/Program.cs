@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using TaskListYangBotWeb.Data;
 using TaskListYangBotWeb.Data.Interfaces;
 using TaskListYangBotWeb.Data.Repository;
@@ -18,19 +19,11 @@ namespace TaskListYangBotWeb
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            
+
             // добавляем контекст ApplicationContext в качестве сервиса в приложение
             builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            StaticFields.passwordEncryption = builder.Configuration.GetValue<string>("PasswordEncryption");
-            StaticFields.linkTask = builder.Configuration.GetValue<string>("UrlLinkTask");
-            StaticFields.linkManual = builder.Configuration.GetValue<string>("UrlLinkManual");
-            StaticFields.urlTaskList = builder.Configuration.GetValue<string>("UrlTaskList");
-            StaticFields.urlTakeTask = builder.Configuration.GetValue<string>("UrlTakeTask");
-            StaticFields.urlLeaveTask = builder.Configuration.GetValue<string>("UrlLeaveTask");
-            StaticFields.urlCheckToken = builder.Configuration.GetValue<string>("UrlCheckToken");
-            StaticFields.urlTaskTitle = builder.Configuration.GetValue<string>("UrlTaskTitle");
-            StaticFields.urlCheckNorm = builder.Configuration.GetValue<string>("UrlCheckNorm");
+            SetStaticFields(builder);
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -65,6 +58,10 @@ namespace TaskListYangBotWeb
             builder.Services.AddScoped<BaseHandler, DefaultCommand>();
             builder.Services.AddScoped<BaseHandler, CheckTokenReply>();
 
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration).CreateLogger();
+            builder.Host.UseSerilog();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -74,6 +71,8 @@ namespace TaskListYangBotWeb
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseSerilogRequestLogging();
 
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -87,6 +86,19 @@ namespace TaskListYangBotWeb
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
+        }
+
+        private static void SetStaticFields(WebApplicationBuilder builder)
+        {
+            StaticFields.passwordEncryption = builder.Configuration.GetValue<string>("PasswordEncryption");
+            StaticFields.linkTask = builder.Configuration.GetValue<string>("UrlLinkTask");
+            StaticFields.linkManual = builder.Configuration.GetValue<string>("UrlLinkManual");
+            StaticFields.urlTaskList = builder.Configuration.GetValue<string>("UrlTaskList");
+            StaticFields.urlTakeTask = builder.Configuration.GetValue<string>("UrlTakeTask");
+            StaticFields.urlLeaveTask = builder.Configuration.GetValue<string>("UrlLeaveTask");
+            StaticFields.urlCheckToken = builder.Configuration.GetValue<string>("UrlCheckToken");
+            StaticFields.urlTaskTitle = builder.Configuration.GetValue<string>("UrlTaskTitle");
+            StaticFields.urlCheckNorm = builder.Configuration.GetValue<string>("UrlCheckNorm");
         }
     }
 }

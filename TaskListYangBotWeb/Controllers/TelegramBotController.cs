@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Telegram.Bot.Types;
 using TaskListYangBotWeb.Services.Interfaces;
+using Serilog;
 
 namespace TaskListYangBotWeb.Controllers
 {
@@ -23,11 +24,12 @@ namespace TaskListYangBotWeb.Controllers
 
             try
             {
+                Log.Information("Update => {@update}", update);
                 await _commandExecutor.Execute(update);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Log.Error("Update => {@update} \nException => {@ex}", update, ex);
                 return Ok();
             }
             return Ok();

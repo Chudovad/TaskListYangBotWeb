@@ -19,7 +19,7 @@ namespace TaskListYangBotWeb.Helper
             {
                 return _botClient;
             }
-            _botClient = new TelegramBotClient(_configuration["TokenTest"]);
+            _botClient = new TelegramBotClient(_configuration["Token"]);
             var webHook = $"{_configuration["UrlWebhook"]}api/message/update";
             await _botClient.SetWebhookAsync(webHook);
             return _botClient;

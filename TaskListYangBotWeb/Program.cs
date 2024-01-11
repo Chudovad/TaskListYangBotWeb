@@ -43,6 +43,7 @@ namespace TaskListYangBotWeb
             builder.Services.AddScoped<BaseHandler, YangOnCommand>();
             builder.Services.AddScoped<BaseHandler, YangOnFavoriteCommand>();
             builder.Services.AddScoped<BaseHandler, FavoriteTaskCommand>();
+            builder.Services.AddScoped<BaseHandler, CreateLinkCommand>();
 
             builder.Services.AddScoped<BaseHandler, AddToFavoriteReply>();
 

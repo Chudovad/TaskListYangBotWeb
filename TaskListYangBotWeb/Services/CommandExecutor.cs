@@ -36,6 +36,11 @@ namespace TaskListYangBotWeb.Services
                     await _commands.FirstOrDefault(c => c.Name == CommandNames.StartCommand).ExecuteAsync(update);
                     return;
                 }
+                if (Uri.IsWellFormedUriString(update.Message.Text, UriKind.Absolute))
+                {
+                    await _commands.FirstOrDefault(c => c.Name == CommandNames.CreateLinkCommand).ExecuteAsync(update);
+                    return;
+                }
                 if (_commands.Any(c => update.Message.Text == c.Name))
                 {
                     if (!CommandStatus.commandStatus.ContainsKey(update.Message.Chat.Id))

@@ -1,0 +1,18 @@
+﻿@{
+    var isAuthenticated = User.Identity.IsAuthenticated;
+}
+
+<div class="text-end">
+    @if (isAuthenticated)
+    {
+        <a class="nav-link text-white" asp-controller="Account" asp-action="Index" title="Manage">Hello @User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value !</a>
+        <form class="form-inline" asp-controller="Account" asp-action="Logout" method="post">
+            <button type="submit" class="nav-link btn btn-link text-white">Logout</button>
+        </form>
+    }
+    else
+    {
+        <a class="btn btn-outline-light me-2" asp-area="" asp-controller="Login" asp-action="Index">Login</a>
+        <a class="btn btn-warning" asp-area="" asp-controller="Register" asp-action="Index">Sign-up</a>
+    }
+</div>

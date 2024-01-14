@@ -1,12 +1,17 @@
-﻿using System;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using TaskListYangBotWeb.Data.Interfaces;
+using TaskListYangBotWeb.Models;
 
-namespace TaskListYangBotWeb
+namespace TaskListYangBotWeb.Services
 {
-    class Encryption
+    class EncryptionService
     {
         public static byte[] EncryptStringToBytes(string plainText, string password)
         {
@@ -30,7 +35,7 @@ namespace TaskListYangBotWeb
             cs.Write(plainTextBytes, 0, plainTextBytes.Length);
 
             // Pad the data with zeroes so it is a multiple of the block size.
-            int padding = (int)(16 - (plainTextBytes.Length % 16));
+            int padding = 16 - plainTextBytes.Length % 16;
             byte[] paddingBytes = new byte[padding];
             Array.Clear(paddingBytes, 0, paddingBytes.Length);
             cs.Write(paddingBytes, 0, paddingBytes.Length);
@@ -66,7 +71,33 @@ namespace TaskListYangBotWeb
 
             // Convert the decrypted data to a string.
             byte[] decryptedBytes = ms.ToArray();
-            return Encoding.UTF8.GetString(decryptedBytes);
+            return Encoding.UTF8.GetString(decryptedBytes).Replace("\0", "");
+        }
+
+        public static string GenerateJwt(UserWeb userWeb, IConfiguration _configuration, out CookieOptions cookieOptions)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, userWeb.Username),
+                new Claim(ClaimTypes.Role, userWeb.Role.RoleName),
+            };
+
+            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
+                _configuration["Jwt:Audience"],
+                claims,
+                expires: DateTime.Now.AddMinutes(15),
+                signingCredentials: credentials);
+            cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            };
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

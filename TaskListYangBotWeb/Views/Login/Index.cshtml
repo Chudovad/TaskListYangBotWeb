@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+@model TaskListYangBotWeb.Models.UserWebLogin
+<div class="w-100 p-4 d-flex justify-content-center pb-4">
+    <form asp-action="Index" asp-controller="Login" method="post">
+        <div class="form-outline mb-4">
+            <label class="form-label" asp-for="Username">Username</label>
+            <input type="text" asp-for="Username" id="Username" class="form-control" />
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+
+        <div class="form-outline mb-4">
+            <label class="form-label" asp-for="Password">Password</label>
+            <input type="password" asp-for="Password" id="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-block mb-3">Sign in</button>
+        </div>
+        <div class="text-center">
+            <p>Not a member? <a asp-area="" asp-controller="Register" asp-action="Index">Register</a></p>
+        </div>
+    </form>
+</div>

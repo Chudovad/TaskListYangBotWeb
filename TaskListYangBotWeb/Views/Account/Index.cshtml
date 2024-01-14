@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Account";
+    var username = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+    var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+    var role = roleClaim?.Value;
+}
+
+<p>Username: @username</p>
+@if (role != null)
+{
+    <p>Role: @role</p>
+}
+@if (User.IsInRole("Admin"))
+{
+    <partial name="_ManageNav" />
+}

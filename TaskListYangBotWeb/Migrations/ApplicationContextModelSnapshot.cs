@@ -17,7 +17,7 @@ namespace TaskListYangBotWeb.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.14")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -70,6 +70,23 @@ namespace TaskListYangBotWeb.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("TaskListYangBotWeb.Models.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("TaskListYangBotWeb.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -104,6 +121,32 @@ namespace TaskListYangBotWeb.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("TaskListYangBotWeb.Models.UserWeb", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("UsersWeb");
+                });
+
             modelBuilder.Entity("TaskListYangBotWeb.Models.FavoriteTask", b =>
                 {
                     b.HasOne("TaskListYangBotWeb.Models.User", "User")
@@ -122,6 +165,17 @@ namespace TaskListYangBotWeb.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TaskListYangBotWeb.Models.UserWeb", b =>
+                {
+                    b.HasOne("TaskListYangBotWeb.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("TaskListYangBotWeb.Models.User", b =>

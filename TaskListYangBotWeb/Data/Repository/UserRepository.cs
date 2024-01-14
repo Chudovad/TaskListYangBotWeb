@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot.Types;
 using TaskListYangBotWeb.Data.Interfaces;
 using TaskListYangBotWeb.Models;
-using TaskListYangBotWeb;
+using TaskListYangBotWeb.Services;
 
 namespace TaskListYangBotWeb.Data.Repository
 {
@@ -25,7 +25,7 @@ namespace TaskListYangBotWeb.Data.Repository
                     LastName = update.Message.Chat.LastName,
                     UserName = update.Message.Chat.Username,
                     DateReg = DateTime.Now.AddHours(StaticFields.NumberOfAddedHoursForServer),
-                    Token = Encryption.EncryptStringToBytes("", StaticFields.passwordEncryption),
+                    Token = EncryptionService.EncryptStringToBytes("", StaticFields.passwordEncryption),
                     TypeSorting = 2
                 };
                 _context.Add(user);
@@ -51,7 +51,7 @@ namespace TaskListYangBotWeb.Data.Repository
 
             if (user == null)
                 return "";
-            return Encryption.DecryptStringFromBytes(user.Token, StaticFields.passwordEncryption).Replace("\0", "");
+            return EncryptionService.DecryptStringFromBytes(user.Token, StaticFields.passwordEncryption);
         }
 
         public bool UpdateUserToken(long userId, string token)
@@ -59,7 +59,7 @@ namespace TaskListYangBotWeb.Data.Repository
             var user = _context.Users.FirstOrDefault(u =>  userId == u.UserId);
             if (user != null)
             {
-                user.Token = Encryption.EncryptStringToBytes(token, StaticFields.passwordEncryption);
+                user.Token = EncryptionService.EncryptStringToBytes(token, StaticFields.passwordEncryption);
                 _context.Users.Update(user);
                 return Save(); 
             }

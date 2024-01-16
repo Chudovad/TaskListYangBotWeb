@@ -2,6 +2,7 @@
 using TaskListYangBotWeb.Data.Interfaces;
 using TaskListYangBotWeb.Models;
 using TaskListYangBotWeb.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace TaskListYangBotWeb.Data.Repository
 {
@@ -80,6 +81,11 @@ namespace TaskListYangBotWeb.Data.Repository
                 return Save();
             }
             return false;
+        }
+
+        public ICollection<Models.User> GetUsers()
+        {
+            return _context.Users.Include(f => f.FavoriteTasks).OrderByDescending(u => u.DateReg).ToList();
         }
     }
 }

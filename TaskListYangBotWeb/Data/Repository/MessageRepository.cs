@@ -1,4 +1,5 @@
-﻿using TaskListYangBotWeb.Data.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskListYangBotWeb.Data.Interfaces;
 using TaskListYangBotWeb.Models;
 
 namespace TaskListYangBotWeb.Data.Repository
@@ -27,6 +28,16 @@ namespace TaskListYangBotWeb.Data.Repository
                 return Save();
             }
             return false;
+        }
+
+        public ICollection<Message> GetMessages()
+        {
+            return _context.Messages.Include(u => u.User).OrderByDescending(o => o.DateTime).ToList();
+        }
+
+        public ICollection<Message> GetUserMessages(int userId)
+        {
+            return _context.Messages.Include(u => u.User).Where(w => w.User.Id == userId).OrderByDescending(o => o.DateTime).ToList();
         }
 
         public bool Save()

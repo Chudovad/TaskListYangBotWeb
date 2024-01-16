@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Users";
+    @model IEnumerable<TaskListYangBotWeb.Models.User>;
+
+}
+<partial name="_ManageNav" />
+<br />
+<table class="table table-striped" border="1">
+    <thead>
+        <tr>
+            <th scope="col">
+                @Html.DisplayNameFor(model => model.UserId)
+            </th>
+            <th scope="col">
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th scope="col">
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th scope="col">
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th scope="col">
+                @Html.DisplayNameFor(model => model.DateReg)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateReg)
+                </td>
+                <td>
+                    <a class="btn btn-primary" asp-controller="Account" asp-action="GetUserMessages" asp-route-id="@item.Id">
+                        Сообщения
+                    </a>
+                </td>
+                <td>
+                    <a class="btn btn-primary" asp-controller="Account" asp-action="GetUserFavoriteTasks" asp-route-id="@item.UserId">
+                        Любимые задания
+                    </a>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>

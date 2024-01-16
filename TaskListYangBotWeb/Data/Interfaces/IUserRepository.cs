@@ -11,6 +11,6 @@ namespace TaskListYangBotWeb.Data.Interfaces
         bool UpdateUserToken(long userId, string token);
         int GetUserSorting(long userId);
         bool UpdateUserSorting(long userId, int typeSorting);
-
+        ICollection<Models.User> GetUsers();
     }
 }

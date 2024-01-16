@@ -46,7 +46,7 @@ namespace TaskListYangBotWeb.Data.Repository
 
         public UserWeb GetUser(string username)
         {
-            return _context.UsersWeb.FirstOrDefault(u => u.Username == username);
+            return _context.UsersWeb.Include(r => r.Role).FirstOrDefault(u => u.Username == username);
         }
     }
 }

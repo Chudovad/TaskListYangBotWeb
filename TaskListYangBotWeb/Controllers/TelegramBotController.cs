@@ -3,11 +3,13 @@ using Newtonsoft.Json;
 using Telegram.Bot.Types;
 using TaskListYangBotWeb.Services.Interfaces;
 using Serilog;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TaskListYangBotWeb.Controllers
 {
     [Route("api/message/update")]
     [ApiController]
+    [AllowAnonymous]
     public class TelegramBotController : ControllerBase
     {
         private readonly ICommandExecutor _commandExecutor;
@@ -15,6 +17,13 @@ namespace TaskListYangBotWeb.Controllers
         public TelegramBotController(ICommandExecutor commandExecutor)
         {
             _commandExecutor = commandExecutor;
+        }
+
+
+        [HttpGet]
+        public ActionResult Update()
+        {
+            return Ok();
         }
 
         [HttpPost]

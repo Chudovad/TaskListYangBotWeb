@@ -8,6 +8,7 @@ using Telegram.Bot.Types;
 using TaskListYangBotWeb.Models;
 using TaskListYangBotWeb.Data.Interfaces;
 using TaskListYangBotWeb.Handlers.Commands;
+using Serilog;
 
 namespace TaskListYangBotWeb.Services
 {
@@ -176,7 +177,7 @@ namespace TaskListYangBotWeb.Services
                             environmentShort = takeTaskResponse.tasks[0].input_values.data.testrun_info.environment != null ? $"({Regex.Replace(Convert.ToString(takeTaskResponse.tasks[0].input_values.data.testrun_info.environment), @"<[^>]+>|&nbsp;|&emsp;", " ")})" : "";
                             checkEnvironmentOld = takeTaskResponse.tasks[0].input_values.data.testrun_info.final_requester_code != null ? $"Код проверки окружения: {takeTaskResponse.tasks[0].input_values.data.testrun_info.final_requester_code}" : "";
 
-                            if (takeTaskResponse.tasks[0].input_values.data.testrun_info.env_descr == null)
+                            if (takeTaskResponse.tasks[0].input_values.data.testrun_info.env_descr != null)
                                 environment = $"Окружение: {Regex.Replace(Convert.ToString(takeTaskResponse.tasks[0].input_values.data.testrun_info.env_descr).Replace("unknown", ""), @"<[^>]+>|&nbsp;|&emsp;", " ")}";
                             else
                                 environment = ParseWebEnvironment(takeTaskResponse);
@@ -191,6 +192,7 @@ namespace TaskListYangBotWeb.Services
             }
             catch (Exception ex)
             {
+                Log.Error("Update => {@update} \nException => {@ex}", update, ex);
                 await _telegramBotClient.SendTextMessageAsync(chatId, $"Ошибка! {ex.Message}");
             }
         }

@@ -13,5 +13,6 @@
         public const string YangOnFavoriteCommand = "/yangonfavorite";
         public const string DefaultCommand = "Default";
         public const string CreateLinkCommand = "CreateLink";
+        public const string AdminCommand = "/admin";
     }
 }

@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Net;
 using System.Text;
 using TaskListYangBotWeb.Data;
 using TaskListYangBotWeb.Data.Interfaces;
@@ -49,6 +51,7 @@ namespace TaskListYangBotWeb
             builder.Services.AddScoped<BaseHandler, YangOnFavoriteCommand>();
             builder.Services.AddScoped<BaseHandler, FavoriteTaskCommand>();
             builder.Services.AddScoped<BaseHandler, CreateLinkCommand>();
+            builder.Services.AddScoped<BaseHandler, AdminCommand>();
 
             builder.Services.AddScoped<BaseHandler, AddToFavoriteReply>();
 
@@ -119,7 +122,13 @@ namespace TaskListYangBotWeb
             app.UseRouting();
 
             app.UseAuthentication();
+            app.UseStatusCodePages(async context => {
+                var request = context.HttpContext.Request;
+                var response = context.HttpContext.Response;
 
+                if (response.StatusCode == (int)HttpStatusCode.Unauthorized)
+                    response.Redirect("/Login");
+            });
             app.UseAuthorization();
 
             app.MapControllerRoute(

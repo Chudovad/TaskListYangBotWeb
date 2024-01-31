@@ -1,5 +1,6 @@
 ﻿using TaskListYangBotWeb.Handlers;
 using TaskListYangBotWeb.Models;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TaskListYangBotWeb
@@ -10,9 +11,8 @@ namespace TaskListYangBotWeb
         {
             IReplyMarkup replyMarkup;
             string linkTask = StaticFields.linkTask + takeTaskResponse.poolId + "/" + takeTaskResponse.id;
-            string checkEnvironment = takeTaskResponse.tasks[0].input_values.data.testrun_info.env_requester_code_explanation != null
-
-                ? takeTaskResponse.tasks[0].input_values.data.testrun_info.env_requester_code_explanation[0]
+            string checkEnvironment = takeTaskResponse.tasks[0].input_values.data.version_info.env_requester_code_explanation != null
+                ? takeTaskResponse.tasks[0].input_values.data.version_info.env_requester_code_explanation[0]
                 : "";
             string urlTestStand = takeTaskResponse.tasks[0].input_values.data.version_info.test_stend;
 
@@ -34,6 +34,15 @@ namespace TaskListYangBotWeb
             }
 
             return replyMarkup;
+        }
+
+        public static IReplyMarkup GetButtonWebApp(string textButton, string urlWebApp)
+        {
+            InlineKeyboardButton keyboardButton = new InlineKeyboardButton(textButton)
+            {
+                WebApp = new WebAppInfo() { Url = urlWebApp }
+            };
+            return new InlineKeyboardMarkup(keyboardButton);
         }
 
         public static IReplyMarkup GetButton(int id, string textButton1, string textButton2)

@@ -1,38 +1,41 @@
 ﻿@{
     ViewData["Title"] = "Messages";
     @model IEnumerable<TaskListYangBotWeb.Models.Message>;
+
 }
 <partial name="_ManageNav" />
 <br />
-<table class="table table-striped" border="1">
-    <thead>
-        <tr>
-            <th scope="col">
-                @Html.DisplayNameFor(model => model.TextMessage)
-            </th>
-            <th scope="col">
-                @Html.DisplayNameFor(model => model.DateTime)
-            </th>
-            <th scope="col">
-                @Html.DisplayNameFor(model => model.User.UserName)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div class="table-responsive">
+    <table class="table table-striped" border="1">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TextMessage)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DateTime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.User.UserName)
-                </td>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.TextMessage)
+                </th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.DateTime)
+                </th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.User.UserName)
+                </th>
             </tr>
-        }
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TextMessage)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DateTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.User.UserName)
+                    </td>
+                </tr>
+            }
 
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>

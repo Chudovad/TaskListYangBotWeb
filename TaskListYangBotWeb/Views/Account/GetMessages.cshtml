@@ -1,7 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Messages";
-    @model IEnumerable<TaskListYangBotWeb.Models.Message>;
-
+    @model TaskListYangBotWeb.Models.PageViewModel;
 }
 <partial name="_ManageNav" />
 <br />
@@ -10,10 +9,10 @@
         <thead>
             <tr>
                 <th scope="col">
-                    @Html.DisplayNameFor(model => model.TextMessage)
+                    @Html.DisplayNameFor(model => model.Message.TextMessage)
                 </th>
                 <th scope="col">
-                    @Html.DisplayNameFor(model => model.DateTime)
+                    @Html.DisplayNameFor(model => model.Message.DateTime)
                 </th>
                 <th scope="col">
                     @Html.DisplayNameFor(model => model.User.UserName)
@@ -21,7 +20,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.Messages)
             {
                 <tr>
                     <td>
@@ -39,3 +38,43 @@
         </tbody>
     </table>
 </div>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        @if (Model.PageInfoModel.TotalPages > 5)
+        {
+            <li class="page-item @(Model.PageInfoModel.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("GetMessages", new { page = Model.PageInfoModel.CurrentPage - 1, pageSize = Model.PageInfoModel.ItemsPerPage })" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            @for (int i = 1; i <= Model.PageInfoModel.TotalPages; i++)
+            {
+                if (i == 1 || i == Model.PageInfoModel.TotalPages || (i >= Model.PageInfoModel.CurrentPage - 1 && i <= Model.PageInfoModel.CurrentPage + 1))
+                {
+                    <li class="page-item @(i == Model.PageInfoModel.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("GetMessages", new { page = i, pageSize = Model.PageInfoModel.ItemsPerPage })">@i</a>
+                    </li>
+                }
+                else if (i == Model.PageInfoModel.CurrentPage - 2 || i == Model.PageInfoModel.CurrentPage + 2)
+                {
+                    <li class="page-item"><a class="page-link">...</a></li>
+                }
+            }
+            <li class="page-item @(Model.PageInfoModel.CurrentPage == Model.PageInfoModel.TotalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("GetMessages", new { page = Model.PageInfoModel.CurrentPage + 1, pageSize = Model.PageInfoModel.ItemsPerPage })" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            for (int i = 1; i <= Model.PageInfoModel.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageInfoModel.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("GetMessages", new { page = i, pageSize = Model.PageInfoModel.ItemsPerPage })">@i</a>
+                </li>
+            }
+        }
+    </ul>
+</nav>

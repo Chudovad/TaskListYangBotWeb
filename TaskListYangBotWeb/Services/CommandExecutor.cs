@@ -57,6 +57,7 @@ namespace TaskListYangBotWeb.Services
             }
             else if (update.Type == UpdateType.CallbackQuery)
             {
+                _messageRepository.AddUserMessage(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Data);
                 if (update?.CallbackQuery != null && _commands.Any(c => update.CallbackQuery.Data.Contains(c.Name)))
                 {
                     await ExecuteCallback(update.CallbackQuery.Data, update);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
 using TaskListYangBotWeb.Data.Interfaces;
 using TaskListYangBotWeb.Models;
+using TaskListYangBotWeb.Services;
 
 namespace TaskListYangBotWeb.Controllers
 {
@@ -42,16 +43,45 @@ namespace TaskListYangBotWeb.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet("{controller}/{action}/{userId:int}")]
-        public IActionResult GetUserMessages(int userId)
+        public IActionResult GetUserMessages(int userId, int page = 1, int pageSize = 10)
         {
-            return View(_messageRepository.GetUserMessages(userId));
+            var userMessages = _messageRepository.GetUserMessages(userId);
+
+            PageViewModel viewModel = GetPage(userMessages, page, pageSize);
+
+            return View(viewModel);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public IActionResult GetMessages()
+        public IActionResult GetMessages(int page = 1, int pageSize = 10)
         {
-            return View(_messageRepository.GetMessages());
+            var messagesData = _messageRepository.GetMessages();
+
+            PageViewModel viewModel = GetPage(messagesData, page, pageSize);
+
+            return View(viewModel);
+        }
+
+        private PageViewModel GetPage(ICollection<Message> data, int page, int pageSize)
+        {
+            int totalMessages = data.Count;
+            int totalPages = (int)Math.Ceiling((double)totalMessages / pageSize);
+
+            var currentPageData = data.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var viewModel = new PageViewModel
+            {
+                Messages = currentPageData,
+                PageInfoModel = new PageInfoModel
+                {
+                    CurrentPage = page,
+                    ItemsPerPage = pageSize,
+                    TotalItems = totalMessages,
+                    TotalPages = totalPages
+                }
+            };
+            return viewModel;
         }
 
         [Authorize(Roles = "Admin")]

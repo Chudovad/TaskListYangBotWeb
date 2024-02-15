@@ -39,6 +39,7 @@ namespace TaskListYangBotWeb
             builder.Services.AddScoped<IMessageRepository, MessageRepository>();
             builder.Services.AddScoped<IUserWebRepository, UserWebRepository>();
             builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+            builder.Services.AddScoped<IFavoriteEnvironmentRepository, FavoriteEnvironmentRepository>();
 
             builder.Services.AddScoped<ICommandExecutor, CommandExecutor>();
             builder.Services.AddScoped<BaseHandler, StartCommand>();
@@ -52,20 +53,24 @@ namespace TaskListYangBotWeb
             builder.Services.AddScoped<BaseHandler, FavoriteTaskCommand>();
             builder.Services.AddScoped<BaseHandler, CreateLinkCommand>();
             builder.Services.AddScoped<BaseHandler, AdminCommand>();
-
-            builder.Services.AddScoped<BaseHandler, AddToFavoriteReply>();
+            builder.Services.AddScoped<BaseHandler, FavoriteEnvironmentsCommand>();
 
             builder.Services.AddScoped<BaseHandler, TypeSortingCallback>();
             builder.Services.AddScoped<BaseHandler, ExitTaskCallback>();
             builder.Services.AddScoped<BaseHandler, TakeTaskCallback>();
-            builder.Services.AddScoped<BaseHandler, AddToFavoriteCallback>();
+            builder.Services.AddScoped<BaseHandler, AddToFavoriteTaskCallback>();
             builder.Services.AddScoped<BaseHandler, DeleteFavoriteTaskCallback>();
+            builder.Services.AddScoped<BaseHandler, AddToFavoriteEnvironmentCallback>();
+            builder.Services.AddScoped<BaseHandler, DeleteFavoriteEnvironmentCallback>();
 
             builder.Services.AddScoped<BaseHandler, CompleteYangOnKeyboardCommand>();
             builder.Services.AddScoped<BaseHandler, CompleteYangKeyboardCommand>();
             builder.Services.AddScoped<BaseHandler, GetTwentyTaskKeyboardCommand>();
             builder.Services.AddScoped<BaseHandler, DefaultCommand>();
+
+            builder.Services.AddScoped<BaseHandler, AddToFavoriteTaskReply>();
             builder.Services.AddScoped<BaseHandler, CheckTokenReply>();
+            builder.Services.AddScoped<BaseHandler, AddToFavoriteEnvironmentReply>();
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration).CreateLogger();

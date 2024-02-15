@@ -14,5 +14,7 @@
         public const string DefaultCommand = "Default";
         public const string CreateLinkCommand = "CreateLink";
         public const string AdminCommand = "/admin";
+        public const string FavoriteEnvironmentsCommand = "/favorite_environment";
+        public const string YangOnEnvironmentCommand = "/yangonenvironment";
     }
 }

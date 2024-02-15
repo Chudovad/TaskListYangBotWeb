@@ -16,5 +16,6 @@ namespace TaskListYangBotWeb.Data
         public DbSet<FavoriteTask> FavoriteTasks { get; set; }
         public DbSet<UserWeb> UsersWeb { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<FavoriteEnvironment> FavoriteEnvironments { get; set; }
     }
 }

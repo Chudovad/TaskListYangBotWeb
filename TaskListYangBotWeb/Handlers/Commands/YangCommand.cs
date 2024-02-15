@@ -61,8 +61,8 @@ namespace TaskListYangBotWeb.Handlers.Commands
                     }
                     else
                     {
-                        string message = "🔹" + "Задание 🔹\r\n" + item.description + "(" + item.pools[0].reward + ")" + "\r\n" + item.title + "\r\n";
-                        IReplyMarkup replyMarkup = CreateButtons.GetButton((int)item.pools[0].id, "Приступить", "В любимые");
+                        string message = "🔹" + "Задание 🔹\r\n" + item.description + "\r\nСтоимость: " + item.pools[0].reward + "\r\n" + item.title + "\r\n";
+                        IReplyMarkup replyMarkup = CreateButtons.GetButtonsTask((int)item.pools[0].id, "Приступить", "В любимые задания", "В любимые окружения");
                         await client.SendTextMessageAsync(update.Message.Chat.Id, message, replyMarkup: replyMarkup);
                         Thread.Sleep(100);
                     }

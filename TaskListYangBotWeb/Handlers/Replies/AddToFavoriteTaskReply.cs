@@ -10,18 +10,18 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TaskListYangBotWeb.Handlers.Replies
 {
-    public class AddToFavoriteReply : BaseHandler
+    public class AddToFavoriteTaskReply : BaseHandler
     {
         private readonly TelegramBotClient _telegramBotClient;
         private readonly IFavoriteTaskRepository _favoriteTaskRepository;
 
-        public AddToFavoriteReply(TelegramBotService telegramBotHelper, IFavoriteTaskRepository favoriteTaskRepository)
+        public AddToFavoriteTaskReply(TelegramBotService telegramBotHelper, IFavoriteTaskRepository favoriteTaskRepository)
         {
             _telegramBotClient = telegramBotHelper.GetBot().Result;
             _favoriteTaskRepository = favoriteTaskRepository;
         }
 
-        public override string Name => ReplayNames.AddToFavoriteReply;
+        public override string Name => ReplayNames.AddToFavoriteTaskReply;
 
         public async override Task ExecuteAsync(Update update)
         {
@@ -33,7 +33,7 @@ namespace TaskListYangBotWeb.Handlers.Replies
                 List<FavoriteTask> favoriteTasks = _favoriteTaskRepository.GetUserFavoriteTasks(update.Message.Chat.Id).ToList();
                 if (favoriteTasks.Count != 0)
                 {
-                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.RemoveMsg, replyMarkup: CreateButtons.GetButtonsFavoriteTasks(favoriteTasks));
+                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.RemoveTaskMsg, replyMarkup: CreateButtons.GetButtonsFavoriteTasks(favoriteTasks));
                     await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.FavoriteTaskMsg
                         , replyMarkup: new ForceReplyMarkup { Selective = true, InputFieldPlaceholder = "Название задания" });
                 }

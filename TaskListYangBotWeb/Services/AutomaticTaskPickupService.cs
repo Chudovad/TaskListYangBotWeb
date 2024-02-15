@@ -82,8 +82,8 @@ namespace TaskListYangBotWeb.Services
             if (withFavorite)
                 return ApplySorting(ParseYangService.RequestToApiTaskList(tokenYang)
                     .Where(x => listFavoriteTasks.Any(q =>
-                    x.description != null && x.description.ToString().Contains(q.TaskName) ||
-                    x.title != null && x.title.ToString().Contains(q.TaskName))), typeSorting);
+                        x.description != null && x.description.ToString().Contains(q.TaskName) ||
+                        x.title != null && x.title.ToString().Contains(q.TaskName))), typeSorting);
             else
                 return ApplySorting(ParseYangService.RequestToApiTaskList(tokenYang)
                     .Where(x => x.projectMetaInfo.ignored != true && x.pools[0].activeAssignments == null), typeSorting);

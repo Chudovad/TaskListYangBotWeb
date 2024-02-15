@@ -26,7 +26,7 @@ namespace TaskListYangBotWeb.Handlers.Callbacks
             List<dynamic> leaveTask = taskList.Where(x => x.pools[0].activeAssignments != null && x.pools[0].activeAssignments.Count > 0).ToList();
             ParseYangService.RequestToApiLeaveTask((string)leaveTask[0].pools[0].activeAssignments[0].id, tokenYang);
             await _telegramBotClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id,
-                    $"Вышли из задания '{(string)leaveTask[0].description}'");
+                    $"Вышли из задания '{ParseYangService.GetTaskNameInDescription((string)leaveTask[0].description)}'");
         }
     }
 }

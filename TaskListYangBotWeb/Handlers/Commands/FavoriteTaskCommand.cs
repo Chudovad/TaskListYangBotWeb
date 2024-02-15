@@ -26,7 +26,7 @@ namespace TaskListYangBotWeb.Handlers.Commands
             List<FavoriteTask> favoriteTasks =_favoriteTaskRepository.GetUserFavoriteTasks(update.Message.Chat.Id).ToList();
             if (favoriteTasks.Count != 0)
             {
-                await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.RemoveMsg, replyMarkup: CreateButtons.GetButtonsFavoriteTasks(favoriteTasks));
+                await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.RemoveTaskMsg, replyMarkup: CreateButtons.GetButtonsFavoriteTasks(favoriteTasks));
                 await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, StaticFields.FavoriteTaskMsg
                     ,replyMarkup: new ForceReplyMarkup { Selective = true, InputFieldPlaceholder = "Название задания" });
             }

@@ -19,9 +19,16 @@ namespace TaskListYangBotWeb
         public static string urlTaskTitle { get; set; }
         public static string urlCheckNorm { get; set; }
 
-        private static string commandMsg = $"Список команд:\n{CommandNames.YangCommand} \\- список заданий из Янг 📋\n{CommandNames.AtWorkCommand} \\- задания в работе 🗺\n{CommandNames.YangOnCommand} \\- ждёт пока придут задания и берет первое 🔖" +
-            $"\n{CommandNames.YangOnFavoriteCommand} \\- ждёт пока придут любимые задания и берет первое ⭐️\n{CommandNames.FavoriteTasksCommand} \\- удалить или добавить в список любимых заданий ❤️" +
-            $"\n{CommandNames.TasksSortingCommand.Replace("_", "\\_")} \\- выбор сортировки заданий 📈\n{CommandNames.NormaCommand} \\- недельная норма 💸\n{CommandNames.HelpCommand} \\- Как пользоваться ботом❔";
+        private static string commandMsg = $"Список команд:\n{CommandNames.YangCommand} \\- список заданий из Янг 📋" +
+            $"\n{CommandNames.AtWorkCommand} \\- задания в работе 🗺" +
+            $"\n{CommandNames.YangOnCommand} \\- ждёт пока придут задания и берет первое 🔖" +
+            $"\n{CommandNames.YangOnFavoriteCommand} \\- ждёт пока придут любимые задания и берет первое ⭐️" +
+            $"\n{CommandNames.YangOnEnvironmentCommand} \\- ждёт пока придут любимые окружения и берет первое ⭐️" +
+            $"\n{CommandNames.FavoriteTasksCommand} \\- удалить или добавить в список любимых заданий ❤️" +
+            $"\n{CommandNames.FavoriteEnvironmentsCommand.Replace("_", "\\_")} \\- удалить или добавить любимые окружения 📲" +
+            $"\n{CommandNames.TasksSortingCommand.Replace("_", "\\_")} \\- выбор сортировки заданий 📈" +
+            $"\n{CommandNames.NormaCommand} \\- недельная норма 💸" +
+            $"\n{CommandNames.HelpCommand} \\- Как пользоваться ботом❔";
 
         public static string CommandMsg { get { return commandMsg; } }
 
@@ -43,14 +50,23 @@ namespace TaskListYangBotWeb
 
         public static string HelpMsg { get { return helpMsg; } }
 
-        private static string removeMsg = "Нажмите на кнопку с названием задания чтобы удалить его из списка любимых.";
+        private static string removeTaskMsg = "Нажмите на кнопку с названием задания чтобы удалить его из списка любимых.";
 
-        public static string RemoveMsg { get { return removeMsg; } }
+        public static string RemoveTaskMsg { get { return removeTaskMsg; } }
+
+        private static string removeEnvironmentMsg = "Нажмите на кнопку с названием окружения чтобы удалить его из списка любимых.";
+
+        public static string RemoveEnvironmentMsg { get { return removeEnvironmentMsg; } }
 
         private static string favoriteTaskMsg = "\nОтправьте название любимого задания в ответ на это сообщение и бот добавит его в ваш список." +
                     $"\nПри использовании команды {CommandNames.YangOnFavoriteCommand} будет браться первое задание на столе из вашего списка любимых заданий.";
 
         public static string FavoriteTaskMsg { get { return favoriteTaskMsg; } }
+
+        private static string favoriteEnvironmentMsg = "\nОтправьте название любимого окружения в ответ на это сообщение и бот добавит его в ваш список." +
+            $"\nПри использовании команды {CommandNames.YangOnEnvironmentCommand} будет браться первое задание на столе из вашего списка любимых окружений.";
+
+        public static string FavoriteEnvironmentMsg { get { return favoriteEnvironmentMsg; } }
 
         private static List<string> typesSorting = new List<string> { "по цене(убывание)", "по цене(возрастание)", "без сортировки" };
 

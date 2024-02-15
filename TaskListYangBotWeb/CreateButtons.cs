@@ -45,11 +45,12 @@ namespace TaskListYangBotWeb
             return new InlineKeyboardMarkup(keyboardButton);
         }
 
-        public static IReplyMarkup GetButton(int id, string textButton1, string textButton2)
+        public static IReplyMarkup GetButtonsTask(int id, string textButton1, string textButton2, string textButton3)
         {
             InlineKeyboardButton[][] keyboardButton = new InlineKeyboardButton[][]
             {
-                new InlineKeyboardButton[] { new InlineKeyboardButton(textButton1) { CallbackData = id.ToString() + CallbackNames.TakeTaskCallback }, new InlineKeyboardButton(textButton2) { CallbackData = id.ToString() + CallbackNames.AddToFavoriteCallback } }
+                new InlineKeyboardButton[] { new InlineKeyboardButton(textButton1) { CallbackData = id.ToString() + CallbackNames.TakeTaskCallback } },
+                new InlineKeyboardButton[] { new InlineKeyboardButton(textButton2) { CallbackData = id.ToString() + CallbackNames.AddToFavoriteTaskCallback }, new InlineKeyboardButton(textButton3) { CallbackData = id.ToString() + CallbackNames.AddToFavoriteEnvironmentCallback } }
             };
             return new InlineKeyboardMarkup(keyboardButton);
         }
@@ -110,6 +111,18 @@ namespace TaskListYangBotWeb
             {
                 inlineKeyboard.Add(new InlineKeyboardButton[] { new InlineKeyboardButton(favoriteTasks[i].TaskName) });
                 inlineKeyboard[i][0].CallbackData = CallbackNames.DeleteFavoriteTaskCallback + favoriteTasks[i].PoolId;
+            }
+            return new InlineKeyboardMarkup(inlineKeyboard.ToArray());
+        }
+
+        public static IReplyMarkup GetButtonsFavoriteEnvironments(List<FavoriteEnvironment> favoriteEnvironments)
+        {
+            List<InlineKeyboardButton[]> inlineKeyboard = new List<InlineKeyboardButton[]>();
+
+            for (int i = 0; i < favoriteEnvironments.Count; i++)
+            {
+                inlineKeyboard.Add(new InlineKeyboardButton[] { new InlineKeyboardButton(favoriteEnvironments[i].EnvironmentName) });
+                inlineKeyboard[i][0].CallbackData = CallbackNames.DeleteFavoriteEnvironmentCallback + favoriteEnvironments[i].PoolId;
             }
             return new InlineKeyboardMarkup(inlineKeyboard.ToArray());
         }

@@ -38,8 +38,12 @@ namespace TaskListYangBotWeb.Data.Repository
         public bool DeleteFavoriteTask(long userId, long poolId)
         {
             var userFavoriteTask = _context.FavoriteTasks.Include(c => c.User).FirstOrDefault(u => u.User.UserId == userId && u.PoolId == poolId);
-            _context.Remove(userFavoriteTask);
-            return Save();
+            if (userFavoriteTask != null)
+            {
+                _context.Remove(userFavoriteTask);
+                return Save(); 
+            }
+            return false;
         }
 
         public ICollection<FavoriteTask> GetUserFavoriteTasks(long userId)

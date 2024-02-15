@@ -21,8 +21,6 @@ namespace TaskListYangBotWeb.Handlers.Callbacks
 
         public async override Task ExecuteAsync(Update update)
         {
-            await _telegramBotClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Загрузка...");
-
             if (_favoriteTaskRepository.DeleteFavoriteTask(update.CallbackQuery.Message.Chat.Id, Convert.ToInt32(update.CallbackQuery.Data.Replace(CallbackNames.DeleteFavoriteTaskCallback, ""))))
             {
                 List<FavoriteTask> favoriteTasks = _favoriteTaskRepository.GetUserFavoriteTasks(update.CallbackQuery.Message.Chat.Id).ToList();

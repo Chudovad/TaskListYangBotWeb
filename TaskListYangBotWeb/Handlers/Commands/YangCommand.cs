@@ -57,7 +57,7 @@ namespace TaskListYangBotWeb.Handlers.Commands
                     if (item.pools[0].activeAssignments != null)
                     {
                         var takeTaskResponse = ParseYangService.RequestToApiTakeTask(item.pools[0].id.ToString(), tokenYang);
-                        ParseYangService.GetMessageTakingTask(takeTaskResponse, client, update);
+                        ParseYangService.GetMessageTakingTask(takeTaskResponse, client, update.Message.Chat.Id);
                     }
                     else
                     {

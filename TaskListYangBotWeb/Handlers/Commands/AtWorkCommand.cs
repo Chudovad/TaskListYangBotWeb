@@ -3,7 +3,6 @@ using TaskListYangBotWeb.Helper;
 using TaskListYangBotWeb.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TaskListYangBotWeb.Handlers.Commands
 {
@@ -28,7 +27,7 @@ namespace TaskListYangBotWeb.Handlers.Commands
                 foreach (var item in taskListInProgress)
                 {
                     var takeTaskResponse = ParseYangService.RequestToApiTakeTask(item.pools[0].id.ToString(), userToken);
-                    ParseYangService.GetMessageTakingTask(takeTaskResponse, _telegramBotClient, update);
+                    ParseYangService.GetMessageTakingTask(takeTaskResponse, _telegramBotClient, update.Message.Chat.Id);
                 }
             }
             else

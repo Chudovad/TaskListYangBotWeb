@@ -1,14 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System.Text;
 using System.Text.RegularExpressions;
-using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.Bot;
-using Microsoft.Extensions.ObjectPool;
-using Telegram.Bot.Types;
-using TaskListYangBotWeb.Models;
 using TaskListYangBotWeb.Data.Interfaces;
 using TaskListYangBotWeb.Handlers.Commands;
-using Serilog;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TaskListYangBotWeb.Services
 {
@@ -162,48 +159,35 @@ namespace TaskListYangBotWeb.Services
             return description.Split(':').Where(x => !string.IsNullOrEmpty(x)).Last().TrimStart();
         }
 
-        public static async Task GetMessageTakingTask(dynamic takeTaskResponse, TelegramBotClient _telegramBotClient, Update update)
+        public static async Task GetMessageTakingTask(dynamic takeTaskResponse, TelegramBotClient _telegramBotClient, long chatId)
         {
-            long chatId;
-            if (update.Message != null)
-                chatId = update.Message.Chat.Id;
-            else
-                chatId = update.CallbackQuery.Message.Chat.Id;
-            try
+            string message;
+            if (takeTaskResponse.statusCode == 200)
             {
-                string message;
-                if (takeTaskResponse.statusCode == 200)
+                if (takeTaskResponse.tasks != null)
                 {
-                    if (takeTaskResponse.tasks != null)
+                    string reward = takeTaskResponse.reward;
+                    string projectName = takeTaskResponse.tasks[0].input_values.data == null ? takeTaskResponse.title : takeTaskResponse.tasks[0].input_values.data.version_info.project_name;
+                    string environmentShort = "";
+                    string environment = "";
+                    string checkEnvironmentOld = "";
+
+                    if (takeTaskResponse.tasks[0].input_values.data != null)
                     {
-                        string reward = takeTaskResponse.reward;
-                        string projectName = takeTaskResponse.tasks[0].input_values.data == null ? takeTaskResponse.title : takeTaskResponse.tasks[0].input_values.data.version_info.project_name;
-                        string environmentShort = "";
-                        string environment = "";
-                        string checkEnvironmentOld = "";
+                        environmentShort = takeTaskResponse.tasks[0].input_values.data.testrun_info.environment != null ? $"({Regex.Replace(Convert.ToString(takeTaskResponse.tasks[0].input_values.data.testrun_info.environment), @"<[^>]+>|&nbsp;|&emsp;", " ")})" : "";
+                        checkEnvironmentOld = takeTaskResponse.tasks[0].input_values.data.testrun_info.final_requester_code != null ? $"Код проверки окружения: {takeTaskResponse.tasks[0].input_values.data.testrun_info.final_requester_code}" : "";
 
-                        if (takeTaskResponse.tasks[0].input_values.data != null)
-                        {
-                            environmentShort = takeTaskResponse.tasks[0].input_values.data.testrun_info.environment != null ? $"({Regex.Replace(Convert.ToString(takeTaskResponse.tasks[0].input_values.data.testrun_info.environment), @"<[^>]+>|&nbsp;|&emsp;", " ")})" : "";
-                            checkEnvironmentOld = takeTaskResponse.tasks[0].input_values.data.testrun_info.final_requester_code != null ? $"Код проверки окружения: {takeTaskResponse.tasks[0].input_values.data.testrun_info.final_requester_code}" : "";
-
-                            environment = ParseWebEnvironment(takeTaskResponse);
-                            if (environment == "" && takeTaskResponse.tasks[0].input_values.data.testrun_info.env_descr != null)
-                                environment = $"Окружение: {Regex.Replace(Convert.ToString(takeTaskResponse.tasks[0].input_values.data.testrun_info.env_descr).Replace("unknown", ""), @"<[^>]+>|&nbsp;|&emsp;", " ")}";
-                        }
-                        IReplyMarkup replyMarkup = CreateButtons.GetButton(takeTaskResponse);
-                        await _telegramBotClient.SendTextMessageAsync(chatId, $"🔹 Взято задание 🔹\r\n{projectName} ({reward})\r\n\r\n{environment}{environmentShort}\r\n{checkEnvironmentOld}", replyMarkup: replyMarkup);
-                        return;
+                        environment = ParseWebEnvironment(takeTaskResponse);
+                        if (environment == "" && takeTaskResponse.tasks[0].input_values.data.testrun_info.env_descr != null)
+                            environment = $"Окружение: {Regex.Replace(Convert.ToString(takeTaskResponse.tasks[0].input_values.data.testrun_info.env_descr).Replace("unknown", ""), @"<[^>]+>|&nbsp;|&emsp;", " ")}";
                     }
+                    IReplyMarkup replyMarkup = CreateButtons.GetButton(takeTaskResponse);
+                    await _telegramBotClient.SendTextMessageAsync(chatId, $"🔹 Взято задание 🔹\r\n{projectName} ({reward})\r\n\r\n{environment}{environmentShort}\r\n{checkEnvironmentOld}", replyMarkup: replyMarkup);
+                    return;
                 }
-                message = HandleErrorMessages(takeTaskResponse);
-                await _telegramBotClient.SendTextMessageAsync(chatId, message);
             }
-            catch (Exception ex)
-            {
-                Log.Error("Update => {@update} \nException => {@ex}", update, ex);
-                await _telegramBotClient.SendTextMessageAsync(chatId, $"Ошибка! {ex.Message}");
-            }
+            message = HandleErrorMessages(takeTaskResponse);
+            await _telegramBotClient.SendTextMessageAsync(chatId, message);
         }
 
         private static string HandleErrorMessages(dynamic takeTaskResponse)

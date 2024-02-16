@@ -54,6 +54,7 @@ namespace TaskListYangBotWeb
             builder.Services.AddScoped<BaseHandler, CreateLinkCommand>();
             builder.Services.AddScoped<BaseHandler, AdminCommand>();
             builder.Services.AddScoped<BaseHandler, FavoriteEnvironmentsCommand>();
+            builder.Services.AddScoped<BaseHandler, YangOnEnvironmentCommand>();
 
             builder.Services.AddScoped<BaseHandler, TypeSortingCallback>();
             builder.Services.AddScoped<BaseHandler, ExitTaskCallback>();

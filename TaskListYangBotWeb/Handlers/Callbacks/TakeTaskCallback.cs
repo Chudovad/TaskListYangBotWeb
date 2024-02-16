@@ -24,7 +24,7 @@ namespace TaskListYangBotWeb.Handlers.Callbacks
             await _telegramBotClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Загрузка...");
             var userToken = _userRepository.GetUserToken(update.CallbackQuery.Message.Chat.Id);
             var takeTaskResponse = ParseYangService.RequestToApiTakeTask(update.CallbackQuery.Data.Replace(Name, ""), userToken);
-            ParseYangService.GetMessageTakingTask(takeTaskResponse, _telegramBotClient, update);
+            ParseYangService.GetMessageTakingTask(takeTaskResponse, _telegramBotClient, update.CallbackQuery.Message.Chat.Id);
         }
     }
 }

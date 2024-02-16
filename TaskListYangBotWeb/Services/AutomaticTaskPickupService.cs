@@ -1,89 +1,96 @@
 ﻿using System.Globalization;
-using TaskListYangBotWeb.Data.Interfaces;
 using TaskListYangBotWeb.Handlers;
-using TaskListYangBotWeb.Helper;
-using TaskListYangBotWeb.Models;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TaskListYangBotWeb.Services
 {
     public class AutomaticTaskPickupService
     {
-        public static async Task StartYangONCommand(Update update, bool withFavorite, TelegramBotClient _telegramBotClient, IUserRepository _userRepository, IFavoriteTaskRepository _favoriteTaskRepository)
+        private const int waitTime = 2000;
+        private const int periodOfSendingNotification = 30;
+
+        public static async Task StartYangONCommand(long userId, bool withFavorite, TelegramBotClient _telegramBotClient, string tokenYang, int typeSorting, List<string> listFavorite, string commandName)
         {
-
-            string tokenYang = _userRepository.GetUserToken(update.Message.Chat.Id);
-            int typeSorting = _userRepository.GetUserSorting(update.Message.Chat.Id);
-            List<FavoriteTask> listFavoriteTasks = _favoriteTaskRepository.GetUserFavoriteTasks(update.Message.Chat.Id).ToList();
-            int waitTime = 2000;
-            int periodOfSendingNotification = 500;
-
-            if (withFavorite == true && listFavoriteTasks.Count == 0)
+            if (withFavorite && listFavorite.Count == 0)
             {
-                await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, 
-                    $"Для использования команды {CommandNames.YangOnFavoriteCommand} добавьте любимые задания в команде {CommandNames.FavoriteTasksCommand} или {CommandNames.YangCommand}, нажав на кнопку 'В любимые' в задании");
+                await SendNoFavoriteTasksMessage(userId, _telegramBotClient);
                 return;
             }
-            else if (withFavorite == true && listFavoriteTasks.Count != 0)
-                await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, $"Команда {CommandNames.YangOnFavoriteCommand} включена", replyMarkup: StaticFields.Keyboard);
             else
-                await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, $"Команда {CommandNames.YangOnCommand} включена", replyMarkup: StaticFields.Keyboard);
-            CommandStatus.commandStatus[update.Message.Chat.Id] = true;
+            {
+                await SendCommandStatusMessage(userId, _telegramBotClient, commandName);
+            }
+
+            CommandStatus.commandStatus[userId] = true;
+
+            await StartTaskLoop(userId, withFavorite, tokenYang, listFavorite, typeSorting, _telegramBotClient, commandName);
+        }
+
+        private static async Task SendNoFavoriteTasksMessage(long chatId, TelegramBotClient _telegramBotClient)
+        {
+            string message = $"Для использования команды {CommandNames.YangOnFavoriteCommand} или {CommandNames.YangOnEnvironmentCommand}, " +
+                $"добавьте любимые задания или окружения в команде {CommandNames.FavoriteTasksCommand}, {CommandNames.FavoriteEnvironmentsCommand} или {CommandNames.YangCommand}," +
+                $" нажав на кнопку 'В любимые задания' или 'В любимые окружения'";
+            await _telegramBotClient.SendTextMessageAsync(chatId, message);
+        }
+
+        private static async Task SendCommandStatusMessage(long chatId, TelegramBotClient _telegramBotClient, string commandName)
+        {
+            var message = $"Команда {commandName} включена";
+            await _telegramBotClient.SendTextMessageAsync(chatId, message, replyMarkup: StaticFields.Keyboard);
+        }
+
+        private static async Task StartTaskLoop(long userId, bool withFavorite, string tokenYang, List<string> listFavorite, int typeSorting, TelegramBotClient _telegramBotClient, string commandName)
+        {
             List<dynamic> taskList;
             for (int i = 1; ; i++)
             {
-                taskList = GetTaskList(withFavorite, tokenYang, listFavoriteTasks, typeSorting);
+                taskList = GetTaskList(withFavorite, tokenYang, listFavorite, typeSorting);
 
-                if (CommandStatus.commandStatus[update.Message.Chat.Id] == false)
+                if (!CommandStatus.commandStatus[userId])
                 {
                     break;
                 }
-                else if (i % periodOfSendingNotification == 0)
+                else if (DateTime.Now.Minute % periodOfSendingNotification == 0)
                 {
-                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Заданий ещё нет");
+                    await _telegramBotClient.SendTextMessageAsync(userId, "Заданий ещё нет");
                 }
                 else if (taskList.Count == 0)
                 {
                     Thread.Sleep(waitTime);
                 }
-                else if (CommandStatus.commandStatus[update.Message.Chat.Id] == true)
+                else if (CommandStatus.commandStatus[userId])
                 {
-                    await TakeTask(update, withFavorite, tokenYang, waitTime, taskList, _telegramBotClient);
+                    await TakeTask(userId, withFavorite, tokenYang, taskList, _telegramBotClient, commandName);
                 }
             }
-
         }
 
-        private static async Task TakeTask(Update update, bool withFavorite, string tokenYang, int waitTime, List<dynamic> taskList, TelegramBotClient _telegramBotClient)
+        private static async Task TakeTask(long userId, bool withFavorite, string tokenYang, List<dynamic> taskList, TelegramBotClient _telegramBotClient, string commandName)
         {
-            int numTask = 0;
-
             foreach (var item in taskList)
             {
-                numTask++;
-
                 var takeTaskResponse = ParseYangService.RequestToApiTakeTask(item.pools[0].id.ToString(), tokenYang);
 
                 if (takeTaskResponse.statusCode == 200)
                 {
-                    ParseYangService.GetMessageTakingTask(takeTaskResponse, _telegramBotClient, update);
-                    CommandStatus.commandStatus[update.Message.Chat.Id] = false;
-                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, withFavorite == true ? $"Команда {CommandNames.YangOnFavoriteCommand} выключена" : $"Команда {CommandNames.YangOnCommand} выключена", replyMarkup: new ReplyKeyboardRemove());
+                    ParseYangService.GetMessageTakingTask(takeTaskResponse, _telegramBotClient, userId);
+                    CommandStatus.commandStatus[userId] = false;
+                    await _telegramBotClient.SendTextMessageAsync(userId, $"Команда {commandName} выключена", replyMarkup: new ReplyKeyboardRemove());
                     break;
                 }
             }
             Thread.Sleep(waitTime);
         }
 
-        private static List<dynamic> GetTaskList(bool withFavorite, string tokenYang, List<FavoriteTask> listFavoriteTasks, int typeSorting)
+        private static List<dynamic> GetTaskList(bool withFavorite, string tokenYang, List<string> listFavorite, int typeSorting)
         {
             if (withFavorite)
                 return ApplySorting(ParseYangService.RequestToApiTaskList(tokenYang)
-                    .Where(x => listFavoriteTasks.Any(q =>
-                        x.description != null && x.description.ToString().Contains(q.TaskName) ||
-                        x.title != null && x.title.ToString().Contains(q.TaskName))), typeSorting);
+                    .Where(x => listFavorite.Any(q =>
+                        x.description != null && x.description.ToString().Contains(q) ||
+                        x.title != null && x.title.ToString().Contains(q))), typeSorting);
             else
                 return ApplySorting(ParseYangService.RequestToApiTaskList(tokenYang)
                     .Where(x => x.projectMetaInfo.ignored != true && x.pools[0].activeAssignments == null), typeSorting);

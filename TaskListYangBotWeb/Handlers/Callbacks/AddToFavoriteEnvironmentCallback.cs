@@ -24,10 +24,17 @@ namespace TaskListYangBotWeb.Handlers.Callbacks
             await _telegramBotClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Загрузка...");
             var task = CommandStatus.taskListsUsers[update.CallbackQuery.Message.Chat.Id].Where(x => (int)x.pools[0].id == Convert.ToInt32(update.CallbackQuery.Data.Replace(Name, ""))).ToList();
             string environmentName = ParseYangService.GetEnvironmentInDescription((string)task[0].description);
-            if (_favoriteEnvironmentRepository.AddFavoriteEnvironment(update.CallbackQuery.Message.Chat.Id, environmentName, (long)task[0].pools[0].id))
-                await _telegramBotClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Добавили окружение '" + environmentName + "' в любимые");
+            if (!string.IsNullOrEmpty(environmentName))
+            {
+                if (_favoriteEnvironmentRepository.AddFavoriteEnvironment(update.CallbackQuery.Message.Chat.Id, environmentName, (long)task[0].pools[0].id))
+                    await _telegramBotClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Добавили окружение '" + environmentName + "' в любимые");
+                else
+                    await _telegramBotClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Окружение уже есть в списке любимых"); 
+            }
             else
-                await _telegramBotClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Окружение уже есть в списке любимых");
+            {
+                await _telegramBotClient.SendTextMessageAsync(update.CallbackQuery.Message.Chat.Id, "Окружения нет в описании задания");
+            }
         }
     }
 }

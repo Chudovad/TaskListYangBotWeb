@@ -7,10 +7,31 @@ namespace TaskListYangBotWeb.Services
 {
     public class AutomaticTaskPickupService
     {
+        private Task _task;
+        private CancellationTokenSource _cts;
+        private readonly TimeSpan notificationInterval = TimeSpan.FromMinutes(30);
         private const int waitTime = 2000;
-        private const int periodOfSendingNotification = 30;
 
-        public static async Task StartYangONCommand(long userId, bool withFavorite, TelegramBotClient _telegramBotClient, string tokenYang, int typeSorting, List<string> listFavorite, string commandName)
+        public bool IsRunning => _task != null && !_task.IsCompleted;
+
+        public void Start(long userId, bool withFavorite, TelegramBotClient _telegramBotClient, string tokenYang, int typeSorting, List<string> listFavorite, string commandName)
+        {
+            _cts = new CancellationTokenSource();
+            _task = Task.Run(async () => await StartYangONCommand(_cts.Token, userId, withFavorite, _telegramBotClient, tokenYang, typeSorting, listFavorite, commandName), _cts.Token);
+        }
+
+        public async Task StopAsync()
+        {
+            if (!IsRunning) return;
+
+            _cts.Cancel();
+
+            await Task.WhenAny(_task, Task.Delay(Timeout.Infinite));
+
+            _cts.Dispose();
+        }
+
+        public async Task StartYangONCommand(CancellationToken cancellationToken, long userId, bool withFavorite, TelegramBotClient _telegramBotClient, string tokenYang, int typeSorting, List<string> listFavorite, string commandName)
         {
             if (withFavorite && listFavorite.Count == 0)
             {
@@ -24,7 +45,7 @@ namespace TaskListYangBotWeb.Services
 
             CommandStatus.commandStatus[userId] = true;
 
-            await StartTaskLoop(userId, withFavorite, tokenYang, listFavorite, typeSorting, _telegramBotClient, commandName);
+            await StartTaskLoop(cancellationToken, userId, withFavorite, tokenYang, listFavorite, typeSorting, _telegramBotClient, commandName);
         }
 
         private static async Task SendNoFavoriteTasksMessage(long chatId, TelegramBotClient _telegramBotClient)
@@ -41,19 +62,21 @@ namespace TaskListYangBotWeb.Services
             await _telegramBotClient.SendTextMessageAsync(chatId, message, replyMarkup: StaticFields.Keyboard);
         }
 
-        private static async Task StartTaskLoop(long userId, bool withFavorite, string tokenYang, List<string> listFavorite, int typeSorting, TelegramBotClient _telegramBotClient, string commandName)
+        private async Task StartTaskLoop(CancellationToken cancellationToken, long userId, bool withFavorite, string tokenYang, List<string> listFavorite, int typeSorting, TelegramBotClient _telegramBotClient, string commandName)
         {
             List<dynamic> taskList;
-            for (int i = 1; ; i++)
+            DateTime lastNotificationTime = DateTime.Now;
+            while (!cancellationToken.IsCancellationRequested)
             {
                 taskList = GetTaskList(withFavorite, tokenYang, listFavorite, typeSorting);
 
                 if (!CommandStatus.commandStatus[userId])
                 {
-                    break;
+                    await StopAsync();
                 }
-                else if (DateTime.Now.Minute % periodOfSendingNotification == 0)
+                else if (DateTime.Now - lastNotificationTime >= notificationInterval)
                 {
+                    lastNotificationTime = DateTime.Now;
                     await _telegramBotClient.SendTextMessageAsync(userId, "Заданий ещё нет");
                 }
                 else if (taskList.Count == 0)
@@ -62,12 +85,12 @@ namespace TaskListYangBotWeb.Services
                 }
                 else if (CommandStatus.commandStatus[userId])
                 {
-                    await TakeTask(userId, withFavorite, tokenYang, taskList, _telegramBotClient, commandName);
+                    await TakeTask(userId, tokenYang, taskList, _telegramBotClient, commandName);
                 }
             }
         }
 
-        private static async Task TakeTask(long userId, bool withFavorite, string tokenYang, List<dynamic> taskList, TelegramBotClient _telegramBotClient, string commandName)
+        private async Task TakeTask(long userId, string tokenYang, List<dynamic> taskList, TelegramBotClient _telegramBotClient, string commandName)
         {
             foreach (var item in taskList)
             {
@@ -78,6 +101,7 @@ namespace TaskListYangBotWeb.Services
                     ParseYangService.GetMessageTakingTask(takeTaskResponse, _telegramBotClient, userId);
                     CommandStatus.commandStatus[userId] = false;
                     await _telegramBotClient.SendTextMessageAsync(userId, $"Команда {commandName} выключена", replyMarkup: new ReplyKeyboardRemove());
+                    await StopAsync();
                     break;
                 }
             }

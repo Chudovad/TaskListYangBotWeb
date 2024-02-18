@@ -22,12 +22,11 @@ namespace TaskListYangBotWeb.Handlers.Commands
 
         public override async Task ExecuteAsync(Update update)
         {
-            PaginationService pagination = new PaginationService();
             int typeSorting = _userRepository.GetUserSorting(update.Message.Chat.Id);
             string tokenYang = _userRepository.GetUserToken(update.Message.Chat.Id);
 
             CommandStatus.AddToDictionaryTaskList(typeSorting, tokenYang, update.Message.Chat.Id);
-            pagination.AddToDictionaryNumberPage(update.Message.Chat.Id, 0);
+
             if (CommandStatus.taskListsUsers[update.Message.Chat.Id].Count <= 20)
             {
                 await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Количество заданий: " + CommandStatus.taskListsUsers[update.Message.Chat.Id].Count + "\r\n" + "🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸\r\n");
@@ -35,6 +34,8 @@ namespace TaskListYangBotWeb.Handlers.Commands
             }
             else
             {
+                PaginationService pagination = new PaginationService();
+                pagination.AddToDictionaryNumberPage(update.Message.Chat.Id, 0);
                 List<dynamic> pageTasks = pagination.GetPage(CommandStatus.taskListsUsers[update.Message.Chat.Id], PaginationService.numberOfPageDic[update.Message.Chat.Id], 20);
 
                 await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Количество заданий: " + CommandStatus.taskListsUsers[update.Message.Chat.Id].Count + "\r\n" + "🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸\r\n",

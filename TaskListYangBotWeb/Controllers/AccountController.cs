@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.CodeAnalysis;
 using TaskListYangBotWeb.Data.Interfaces;
 using TaskListYangBotWeb.Models;
-using TaskListYangBotWeb.Services;
 
 namespace TaskListYangBotWeb.Controllers
 {

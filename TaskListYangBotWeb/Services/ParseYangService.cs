@@ -151,7 +151,11 @@ namespace TaskListYangBotWeb.Services
 
         public static string GetTaskNameInDescription(string description)
         {
-            return description.Substring(0, description.IndexOf("\n"));
+            if (description.IndexOf("\n") != -1)
+            {
+                return description.Substring(0, description.IndexOf("\n"));
+            }
+            return description;
         }
 
         public static string GetEnvironmentInDescription(string description)

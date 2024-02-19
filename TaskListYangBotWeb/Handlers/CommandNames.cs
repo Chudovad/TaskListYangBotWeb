@@ -16,5 +16,6 @@
         public const string AdminCommand = "/admin";
         public const string FavoriteEnvironmentsCommand = "/favorite_environment";
         public const string YangOnEnvironmentCommand = "/yangonenvironment";
+        public const string YangOnFavTaskAndEnvCommand = "/yangontaskenv";
     }
 }

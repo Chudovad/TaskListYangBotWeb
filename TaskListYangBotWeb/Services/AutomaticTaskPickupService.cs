@@ -11,13 +11,53 @@ namespace TaskListYangBotWeb.Services
         private CancellationTokenSource _cts;
         private readonly TimeSpan notificationInterval = TimeSpan.FromMinutes(30);
         private const int waitTime = 2000;
+        private readonly long userId;
+        private readonly bool withFavorite;
+        private readonly TelegramBotClient _telegramBotClient;
+        private readonly string tokenYang;
+        private readonly int typeSorting;
+        private readonly List<string> listFavoriteTask;
+        private readonly string commandName;
 
         public bool IsRunning => _task != null && !_task.IsCompleted;
 
-        public void Start(long userId, bool withFavorite, TelegramBotClient _telegramBotClient, string tokenYang, int typeSorting, List<string> listFavorite, string commandName)
+        public AutomaticTaskPickupService(long userId, bool withFavorite, TelegramBotClient _telegramBotClient, string tokenYang, int typeSorting, List<string> listFavoriteTask, string commandName)
+        {
+            this.userId = userId;
+            this.withFavorite = withFavorite;
+            this._telegramBotClient = _telegramBotClient;
+            this.tokenYang = tokenYang;
+            this.typeSorting = typeSorting;
+            this.listFavoriteTask = listFavoriteTask;
+            this.commandName = commandName;
+        }
+
+        public void Start()
         {
             _cts = new CancellationTokenSource();
-            _task = Task.Run(async () => await StartYangONCommand(_cts.Token, userId, withFavorite, _telegramBotClient, tokenYang, typeSorting, listFavorite, commandName), _cts.Token);
+            _task = Task.Run(async () => await StartYangONCommand(_cts.Token), _cts.Token);
+        }
+
+        public void Start(List<string> listFavoriteEnv)
+        {
+            _cts = new CancellationTokenSource();
+            _task = Task.Run(async () => await StartYangOnFavTaskAndEnv(_cts.Token, listFavoriteEnv), _cts.Token);
+        }
+
+        private async Task StartYangOnFavTaskAndEnv(CancellationToken cancellationToken, List<string> listFavoriteEnv)
+        {
+            if (listFavoriteEnv.Count == 0 && listFavoriteTask.Count == 0)
+            {
+                await SendNoFavoriteTasksMessage();
+                return;
+            }
+            else
+            {
+                await SendCommandStatusMessage();
+            }
+            CommandStatus.commandStatus[userId] = true;
+
+            await StartTaskLoop(cancellationToken, listFavoriteEnv);
         }
 
         public async Task StopAsync()
@@ -31,44 +71,44 @@ namespace TaskListYangBotWeb.Services
             _cts.Dispose();
         }
 
-        public async Task StartYangONCommand(CancellationToken cancellationToken, long userId, bool withFavorite, TelegramBotClient _telegramBotClient, string tokenYang, int typeSorting, List<string> listFavorite, string commandName)
+        private async Task StartYangONCommand(CancellationToken cancellationToken)
         {
-            if (withFavorite && listFavorite.Count == 0)
+            if (withFavorite && listFavoriteTask.Count == 0)
             {
-                await SendNoFavoriteTasksMessage(userId, _telegramBotClient);
+                await SendNoFavoriteTasksMessage();
                 return;
             }
             else
             {
-                await SendCommandStatusMessage(userId, _telegramBotClient, commandName);
+                await SendCommandStatusMessage();
             }
 
             CommandStatus.commandStatus[userId] = true;
 
-            await StartTaskLoop(cancellationToken, userId, withFavorite, tokenYang, listFavorite, typeSorting, _telegramBotClient, commandName);
+            await StartTaskLoop(cancellationToken);
         }
 
-        private static async Task SendNoFavoriteTasksMessage(long chatId, TelegramBotClient _telegramBotClient)
+        private async Task SendNoFavoriteTasksMessage()
         {
-            string message = $"Для использования команды {CommandNames.YangOnFavoriteCommand} или {CommandNames.YangOnEnvironmentCommand}, " +
+            string message = $"Для использования команд {CommandNames.YangOnFavoriteCommand}, {CommandNames.YangOnEnvironmentCommand} или {CommandNames.YangOnFavTaskAndEnvCommand}, " +
                 $"добавьте любимые задания или окружения в команде {CommandNames.FavoriteTasksCommand}, {CommandNames.FavoriteEnvironmentsCommand} или {CommandNames.YangCommand}," +
                 $" нажав на кнопку 'В любимые задания' или 'В любимые окружения'";
-            await _telegramBotClient.SendTextMessageAsync(chatId, message);
+            await _telegramBotClient.SendTextMessageAsync(userId, message);
         }
 
-        private static async Task SendCommandStatusMessage(long chatId, TelegramBotClient _telegramBotClient, string commandName)
+        private async Task SendCommandStatusMessage()
         {
             var message = $"Команда {commandName} включена";
-            await _telegramBotClient.SendTextMessageAsync(chatId, message, replyMarkup: StaticFields.Keyboard);
+            await _telegramBotClient.SendTextMessageAsync(userId, message, replyMarkup: StaticFields.Keyboard);
         }
 
-        private async Task StartTaskLoop(CancellationToken cancellationToken, long userId, bool withFavorite, string tokenYang, List<string> listFavorite, int typeSorting, TelegramBotClient _telegramBotClient, string commandName)
+        private async Task StartTaskLoop(CancellationToken cancellationToken)
         {
             List<dynamic> taskList;
             DateTime lastNotificationTime = DateTime.Now;
             while (!cancellationToken.IsCancellationRequested)
             {
-                taskList = GetTaskList(withFavorite, tokenYang, listFavorite, typeSorting);
+                taskList = GetTaskList(withFavorite, tokenYang, listFavoriteTask, typeSorting);
 
                 if (!CommandStatus.commandStatus[userId])
                 {
@@ -85,12 +125,46 @@ namespace TaskListYangBotWeb.Services
                 }
                 else if (CommandStatus.commandStatus[userId])
                 {
-                    await TakeTask(userId, tokenYang, taskList, _telegramBotClient, commandName);
+                    await TakeTask(taskList);
                 }
             }
         }
 
-        private async Task TakeTask(long userId, string tokenYang, List<dynamic> taskList, TelegramBotClient _telegramBotClient, string commandName)
+        private async Task StartTaskLoop(CancellationToken cancellationToken, List<string> listFavoriteEnv)
+        {
+            List<dynamic> taskList;
+            DateTime lastNotificationTime = DateTime.Now;
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                taskList = ApplySorting(ParseYangService.RequestToApiTaskList(tokenYang)
+                    .Where(x => listFavoriteTask.Any(q =>
+                        x.description != null && x.description.ToString().Contains(q) ||
+                        x.title != null && x.title.ToString().Contains(q)) &&
+                        listFavoriteEnv.Any(q =>
+                        x.description != null && x.description.ToString().Contains(q) ||
+                        x.title != null && x.title.ToString().Contains(q))), typeSorting);
+
+                if (!CommandStatus.commandStatus[userId])
+                {
+                    await StopAsync();
+                }
+                else if (DateTime.Now - lastNotificationTime >= notificationInterval)
+                {
+                    lastNotificationTime = DateTime.Now;
+                    await _telegramBotClient.SendTextMessageAsync(userId, "Заданий ещё нет");
+                }
+                else if (taskList.Count == 0)
+                {
+                    Thread.Sleep(waitTime);
+                }
+                else if (CommandStatus.commandStatus[userId])
+                {
+                    await TakeTask(taskList);
+                }
+            }
+        }
+
+        private async Task TakeTask(List<dynamic> taskList)
         {
             foreach (var item in taskList)
             {

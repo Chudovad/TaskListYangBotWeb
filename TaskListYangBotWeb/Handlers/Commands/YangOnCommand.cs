@@ -24,7 +24,6 @@ namespace TaskListYangBotWeb.Handlers.Commands
         {
             if (CommandStatus.commandStatus[update.Message.Chat.Id] == false)
             {
-                AutomaticTaskPickupService automaticTaskPickupService = new AutomaticTaskPickupService();
                 string tokenYang = _userRepository.GetUserToken(update.Message.Chat.Id);
                 int typeSorting = _userRepository.GetUserSorting(update.Message.Chat.Id);
                 List<string?> listFavoriteTasks = _favoriteTaskRepository
@@ -32,7 +31,9 @@ namespace TaskListYangBotWeb.Handlers.Commands
                     .Select(s => s.TaskName)
                     .Where(s => !string.IsNullOrEmpty(s))
                     .ToList();
-                automaticTaskPickupService.Start(update.Message.Chat.Id, false, _telegramBotClient, tokenYang, typeSorting, listFavoriteTasks, CommandNames.YangOnCommand);
+                AutomaticTaskPickupService automaticTaskPickupService = 
+                    new AutomaticTaskPickupService(update.Message.Chat.Id, false, _telegramBotClient, tokenYang, typeSorting, listFavoriteTasks, CommandNames.YangOnCommand);
+                automaticTaskPickupService.Start();
             }
             else
             {

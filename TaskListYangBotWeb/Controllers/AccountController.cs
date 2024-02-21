@@ -11,12 +11,14 @@ namespace TaskListYangBotWeb.Controllers
         private IUserRepository _userRepository;
         private IMessageRepository _messageRepository;
         private IFavoriteTaskRepository _favoriteTaskRepository;
+        private IFavoriteEnvironmentRepository _favoriteEnvironmentRepository;
 
-        public AccountController(IUserRepository userRepository, IMessageRepository messageRepository, IFavoriteTaskRepository favoriteTaskRepository)
+        public AccountController(IUserRepository userRepository, IMessageRepository messageRepository, IFavoriteTaskRepository favoriteTaskRepository, IFavoriteEnvironmentRepository favoriteEnvironmentRepository)
         {
             _userRepository = userRepository;
             _messageRepository = messageRepository;
             _favoriteTaskRepository = favoriteTaskRepository;
+            _favoriteEnvironmentRepository = favoriteEnvironmentRepository;
         }
 
         public IActionResult Index()
@@ -87,6 +89,13 @@ namespace TaskListYangBotWeb.Controllers
         public IActionResult GetUserFavoriteTasks(long userId)
         {
             return View(_favoriteTaskRepository.GetUserFavoriteTasks(userId));
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("{controller}/{action}/{userId:long}")]
+        public IActionResult GetUserFavoriteEnvironments(long userId)
+        {
+            return View(_favoriteEnvironmentRepository.GetUserFavoriteEnvironments(userId));
         }
     }
 }

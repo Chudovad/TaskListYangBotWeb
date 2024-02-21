@@ -1,8 +1,9 @@
 ﻿@{
     ViewData["Title"] = "Users";
     @model IEnumerable<TaskListYangBotWeb.Models.User>;
-
 }
+@using System.Globalization;
+
 <partial name="_ManageNav" />
 <br />
 <div class="table-responsive">
@@ -26,6 +27,7 @@
                 </th>
                 <th></th>
                 <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -45,7 +47,7 @@
                         @Html.DisplayFor(modelItem => item.LastName)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.DateReg)
+                        @item.DateReg.ToString("g", new CultureInfo("ru-RU"))
                     </td>
                     <td>
                         <a class="btn btn-primary" asp-controller="Account" asp-action="GetUserMessages" asp-route-id="@item.Id">
@@ -54,7 +56,12 @@
                     </td>
                     <td>
                         <a class="btn btn-primary" asp-controller="Account" asp-action="GetUserFavoriteTasks" asp-route-id="@item.UserId">
-                            Любимые задания
+                            ❤️ задания
+                        </a>
+                    </td>
+                    <td>
+                        <a class="btn btn-primary" asp-controller="Account" asp-action="GetUserFavoriteEnvironments" asp-route-id="@item.UserId">
+                            ❤️ окружения
                         </a>
                     </td>
                 </tr>

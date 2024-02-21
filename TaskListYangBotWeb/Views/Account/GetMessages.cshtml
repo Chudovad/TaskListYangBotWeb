@@ -2,6 +2,7 @@
     ViewData["Title"] = "Messages";
     @model TaskListYangBotWeb.Models.PageViewModel;
 }
+@using System.Globalization;
 <partial name="_ManageNav" />
 <br />
 <div class="table-responsive">
@@ -27,7 +28,7 @@
                         @Html.DisplayFor(modelItem => item.TextMessage)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.DateTime)
+                        @item.DateTime.ToString("g", new CultureInfo("ru-RU"))
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.User.UserName)

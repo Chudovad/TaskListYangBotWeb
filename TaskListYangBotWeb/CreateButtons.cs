@@ -8,14 +8,20 @@ namespace TaskListYangBotWeb
     public class CreateButtons
     {
         public static IReplyMarkup GetButton(dynamic takeTaskResponse)
-        {
+         {
             IReplyMarkup replyMarkup;
             string linkTask = StaticFields.linkTask + takeTaskResponse.poolId + "/" + takeTaskResponse.id;
-            string checkEnvironment = takeTaskResponse.tasks[0].input_values.data.version_info.env_requester_code_explanation != null
-                ? takeTaskResponse.tasks[0].input_values.data.version_info.env_requester_code_explanation[0]
-                : "";
-            string urlTestStand = takeTaskResponse.tasks[0].input_values.data.version_info.test_stend;
+            string checkEnvironment = "";
+            string urlTestStand = "";
 
+            if (takeTaskResponse.tasks[0].input_values.data != null)
+            {
+                checkEnvironment = takeTaskResponse.tasks[0].input_values.data.version_info.env_requester_code_explanation != null
+                    ? takeTaskResponse.tasks[0].input_values.data.version_info.env_requester_code_explanation[0]
+                    : "";
+                urlTestStand = takeTaskResponse.tasks[0].input_values.data.version_info.test_stend;
+            }
+            
             if (checkEnvironment == "" && !Uri.IsWellFormedUriString(urlTestStand, UriKind.Absolute))
             {
                 replyMarkup = GetButton((int)takeTaskResponse.poolId, "Выйти", "Ссылка на задание", linkTask);
@@ -90,7 +96,7 @@ namespace TaskListYangBotWeb
         public static IReplyMarkup GetButtonTypesSorting(List<string> textButtons, int typeSorting)
         {
             List<InlineKeyboardButton[]> inlineKeyboard = new List<InlineKeyboardButton[]>();
-
+            
             for (int i = 0; i < textButtons.Count; i++)
             {
                 if (typeSorting == i)

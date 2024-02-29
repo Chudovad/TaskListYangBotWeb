@@ -160,7 +160,7 @@ namespace TaskListYangBotWeb.Services
 
         public static string GetEnvironmentInDescription(string description)
         {
-            return description.Split(':').Where(x => !string.IsNullOrEmpty(x)).Last().TrimStart();
+            return description.Split(':').Where(x => !string.IsNullOrEmpty(x)).Last().TrimStart().Split('\n').First();
         }
 
         public static async Task GetMessageTakingTask(dynamic takeTaskResponse, TelegramBotClient _telegramBotClient, long chatId)

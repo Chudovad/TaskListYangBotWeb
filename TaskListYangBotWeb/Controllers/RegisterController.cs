@@ -24,12 +24,12 @@ namespace TaskListYangBotWeb.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public IActionResult Index([FromForm] UserWebRegister user, int roleId)
+        public IActionResult Index([FromForm] UserWebRegister user)
         {
             if (!ModelState.IsValid)
                 return View(user);
 
-            if (_userWebRepository.CreateUser(user, roleId))
+            if (_userWebRepository.CreateUser(user, 2))
             {
                 var token = EncryptionService.GenerateJwt(_userWebRepository.GetUser(user.Username), _configuration, out CookieOptions cookieOptions);
                 Response.Cookies.Append("AuthToken", token, cookieOptions);

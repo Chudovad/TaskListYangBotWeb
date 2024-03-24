@@ -42,12 +42,12 @@ namespace TaskListYangBotWeb.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("{controller}/{action}/{userId:int}")]
-        public IActionResult GetUserMessages(int userId, int page = 1, int pageSize = 10)
+        public IActionResult GetUserMessages(int id, int page = 1, int pageSize = 10)
         {
-            var userMessages = _messageRepository.GetUserMessages(userId);
+            var userMessages = _messageRepository.GetUserMessages(id);
 
             PageViewModel viewModel = GetPage(userMessages, page, pageSize);
+            ViewData["Action"] = nameof(GetUserMessages);
 
             return View(viewModel);
         }
@@ -59,6 +59,7 @@ namespace TaskListYangBotWeb.Controllers
             var messagesData = _messageRepository.GetMessages();
 
             PageViewModel viewModel = GetPage(messagesData, page, pageSize);
+            ViewData["Action"] = nameof(GetMessages);
 
             return View(viewModel);
         }
@@ -85,17 +86,15 @@ namespace TaskListYangBotWeb.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("{controller}/{action}/{userId:long}")]
-        public IActionResult GetUserFavoriteTasks(long userId)
+        public IActionResult GetUserFavoriteTasks(long id)
         {
-            return View(_favoriteTaskRepository.GetUserFavoriteTasks(userId));
+            return View(_favoriteTaskRepository.GetUserFavoriteTasks(id));
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("{controller}/{action}/{userId:long}")]
-        public IActionResult GetUserFavoriteEnvironments(long userId)
+        public IActionResult GetUserFavoriteEnvironments(long id)
         {
-            return View(_favoriteEnvironmentRepository.GetUserFavoriteEnvironments(userId));
+            return View(_favoriteEnvironmentRepository.GetUserFavoriteEnvironments(id));
         }
     }
 }

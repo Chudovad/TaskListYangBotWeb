@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -110,6 +111,8 @@ namespace TaskListYangBotWeb
                 });
             builder.Services.AddMvc();
             builder.Services.AddControllers();
+
+            builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(@"./keys/"));
 
             var app = builder.Build();
 

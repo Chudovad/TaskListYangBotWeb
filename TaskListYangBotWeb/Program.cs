@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -26,7 +25,7 @@ namespace TaskListYangBotWeb
             var builder = WebApplication.CreateBuilder(args);
 
             // добавляем контекст ApplicationContext в качестве сервиса в приложение
-            builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             SetStaticFields(builder);
 
@@ -84,7 +83,8 @@ namespace TaskListYangBotWeb
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 })
-                .AddJwtBearer(options => {
+                .AddJwtBearer(options =>
+                {
                     options.Events = new JwtBearerEvents
                     {
                         OnMessageReceived = context =>
@@ -129,7 +129,8 @@ namespace TaskListYangBotWeb
             app.UseRouting();
 
             app.UseAuthentication();
-            app.UseStatusCodePages(async context => {
+            app.UseStatusCodePages(async context =>
+            {
                 var request = context.HttpContext.Request;
                 var response = context.HttpContext.Response;
 

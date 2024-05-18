@@ -10,12 +10,16 @@
 
   <ItemGroup>
     <None Remove="keys\key-c9898af7-c5ff-49cd-aaa8-79748c6d5d19.xml" />
+    <None Remove="yangDB.db" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="keys\key-c9898af7-c5ff-49cd-aaa8-79748c6d5d19.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <Content Include="yangDB.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

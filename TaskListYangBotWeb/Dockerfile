@@ -20,7 +20,8 @@ RUN dotnet publish -c Release -o output
 # среды выполнения aspnet, без sdk
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /Application
+ENV ASPNETCORE_ENVIRONMENT=Development
 # Скопируем файлы приложения из предыдущего образа 
-COPY --from=builder /Application/output .
+COPY --from=build /Application/output .
 # укажем команду, которая будет запускать приложение
 ENTRYPOINT ["dotnet", "TaskListYangBotWeb.dll"]
